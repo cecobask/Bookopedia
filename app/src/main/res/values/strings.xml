@@ -4,4 +4,5 @@
     <string name="title">Title</string>
     <string name="author">Author</string>
     <string name="cover">cover</string>
+    <string name="menu_search">Search</string>
 </resources>
