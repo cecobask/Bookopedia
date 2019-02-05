@@ -1,11 +1,13 @@
 package ie.bask;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 
@@ -29,12 +31,14 @@ public class BookListActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.book_list);
+        setContentView(R.layout.activity_book_list);
         lvBooks = findViewById(R.id.lvBooks);
         pbSearch = findViewById(R.id.pbSearch);
         ArrayList<Book> aBooks = new ArrayList<>();
         bookAdapter = new BookAdapter(this, aBooks);
         lvBooks.setAdapter(bookAdapter);
+
+        setOnBookClickListener();
     }
 
     @Override
@@ -72,7 +76,7 @@ public class BookListActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    // Executes an API call to the OpenLibrary search endpoint, parses the results
+    // Executes an API call to the Google Books search endpoint, parses the results
     // Converts them into an array of book objects and adds them to the adapter
     private void getBooks(String query) {
         // Show progress bar
@@ -84,12 +88,12 @@ public class BookListActivity extends AppCompatActivity {
                 try {
                     // Hide progress bar
                     pbSearch.setVisibility(View.GONE);
-                    JSONArray docs;
-                    if(response != null) {
-                        // Get the docs json array
-                        docs = response.getJSONArray("docs");
+                    JSONArray items;
+                    if(response.has("items")) {
+                        // Get the items json array
+                        items = response.getJSONArray("items");
                         // Parse json array into array of Book objects
-                        final ArrayList<Book> books = Book.fromJson(docs);
+                        final ArrayList<Book> books = Book.fromJson(items);
                         bookAdapter.clear();
                         // Load Book objects into the adapter
                         for (Book book : books) {
@@ -101,6 +105,18 @@ public class BookListActivity extends AppCompatActivity {
                     pbSearch.setVisibility(View.GONE);
                     e.printStackTrace();
                 }
+            }
+        });
+    }
+
+    public void setOnBookClickListener() {
+        lvBooks.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                // Launch the BookInfo activity passing book as an extra
+                Intent intent = new Intent(BookListActivity.this, BookInfo.class);
+                intent.putExtra("book_info_key", bookAdapter.getItem(position));
+                startActivity(intent);
             }
         });
     }

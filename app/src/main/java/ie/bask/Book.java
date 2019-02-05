@@ -1,22 +1,25 @@
 package ie.bask;
 
 import android.text.TextUtils;
-import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Book {
-    private String openLibraryId;
+public class Book implements Serializable {
+    private String bookId;
     private String author;
     private String title;
+    private String imageLink;
+    private String description;
+    private String publisher;
+    private String numPages;
 
-
-    public String getOpenLibraryId() {
-        return openLibraryId;
+    public String getBookId() {
+        return bookId;
     }
 
     public String getTitle() {
@@ -27,31 +30,36 @@ public class Book {
         return author;
     }
 
-    // Get medium sized book cover from covers API
-    public String getCoverUrl() {
-        return "http://covers.openlibrary.org/b/olid/" + openLibraryId + "-M.jpg?default=false";
-
+    public String getImageLink() {
+        return imageLink;
     }
 
-    // Get large sized book cover from covers API
-    public String getLargeCoverUrl() {
-        return "http://covers.openlibrary.org/b/olid/" + openLibraryId + "-L.jpg?default=false";
+    public String getDescription() {
+        return description;
     }
+
+    public String getPublisher() {
+        return publisher;
+    }
+
+    public String getNumPages() {
+        return numPages;
+    }
+
 
     // Returns a Book given the expected JSON
     public static Book fromJson(JSONObject jsonObject) {
         Book book = new Book();
         try {
             // Deserialize json into object fields
-            // Check if a cover edition is available
-            if (jsonObject.has("cover_edition_key"))  {
-                book.openLibraryId = jsonObject.getString("cover_edition_key");
-            } else if(jsonObject.has("edition_key")) {
-                final JSONArray ids = jsonObject.getJSONArray("edition_key");
-                book.openLibraryId = ids.getString(0);
-            }
-            book.title = jsonObject.has("title_suggest") ? jsonObject.getString("title_suggest") : "";
-            book.author = getAuthor(jsonObject);
+            book.bookId = jsonObject.has("id") ? jsonObject.getString("id") : "";
+            JSONObject volumeInfo = jsonObject.getJSONObject("volumeInfo");
+            book.title = volumeInfo.has("title") ? volumeInfo.getString("title") : "";
+            book.author = getAuthor(volumeInfo);
+            book.imageLink = volumeInfo.has("imageLinks") ? volumeInfo.getJSONObject("imageLinks").getString("smallThumbnail") : "";
+            book.publisher = volumeInfo.has("publisher") ? volumeInfo.getString("publisher") : "";
+            book.numPages = volumeInfo.has("pageCount") ? volumeInfo.getString("pageCount") : "";
+            book.description = volumeInfo.has("description") ? volumeInfo.getString("description") : "";
         } catch (JSONException e) {
             e.printStackTrace();
             return null;
@@ -60,9 +68,9 @@ public class Book {
     }
 
     // Return comma separated author list when there is more than one author
-    private static String getAuthor(final JSONObject jsonObject) {
+    private static String getAuthor(final JSONObject volumeInfo) {
         try {
-            final JSONArray authors = jsonObject.getJSONArray("author_name");
+            final JSONArray authors = volumeInfo.getJSONArray("authors");
             int numAuthors = authors.length();
             final String[] authorStrings = new String[numAuthors];
             for (int i = 0; i < numAuthors; ++i) {

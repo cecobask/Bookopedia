@@ -5,4 +5,6 @@
     <string name="author">Author</string>
     <string name="cover">cover</string>
     <string name="menu_search">Search</string>
+    <string name="publisher">Publisher:</string>
+    <string name="page_count">Pages:</string>
 </resources>

@@ -47,7 +47,7 @@ public class BookAdapter extends ArrayAdapter<Book> {
 
         // Use custom Picasso instance to fetch book cover
         PicassoTrustAll.getInstance(getContext())
-                .load(Uri.parse(book.getCoverUrl()))
+                .load(Uri.parse(book.getImageLink()))
                 .fit().centerInside().error(R.drawable.ic_nocover).into(viewHolder.ivCover);
 
         return convertView;
