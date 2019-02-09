@@ -4,7 +4,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".BookListActivity">
+    tools:context=".activities.BookListActivity">
+
+    <include layout="@layout/toolbar"
+        android:id="@+id/toolbar"/>
 
     <ScrollView
         android:layout_width="match_parent"
@@ -26,6 +29,17 @@
                 android:paddingBottom="8dp" />
 
             <TextView
+                android:id="@+id/tvDateAdded"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:textAlignment="center"
+                android:textSize="20sp"
+                android:textColor="@color/md_grey_700"/>
+
+            <TextView
                 android:id="@+id/tvTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -33,6 +47,7 @@
                 android:paddingLeft="10dp"
                 android:paddingRight="10dp"
                 android:textAlignment="center"
+                android:textStyle="bold"
                 android:textSize="32sp" />
 
             <TextView
@@ -43,6 +58,7 @@
                 android:paddingLeft="10dp"
                 android:paddingRight="10dp"
                 android:textAlignment="center"
+                android:textStyle="bold"
                 android:textSize="22sp" />
 
             <View
@@ -50,6 +66,20 @@
                 android:layout_width="280dp"
                 android:layout_height="1px"
                 android:layout_marginTop="8dp"
+                android:background="@android:color/darker_gray" />
+
+            <Button
+                android:id="@+id/btnToRead"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:text="@string/to_read_button" />
+
+            <View
+                android:id="@+id/hrView2"
+                android:layout_width="match_parent"
+                android:layout_height="1px"
                 android:background="@android:color/darker_gray" />
 
             <TextView
@@ -75,8 +105,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="8dp"
+                android:layout_marginStart="20dp"
                 android:layout_marginTop="8dp"
-                android:textSize="14sp" />
+                android:layout_marginEnd="20dp"
+                android:layout_marginBottom="8dp"
+                android:justificationMode="inter_word"
+                android:textSize="14sp"
+                android:textStyle="italic" />
 
         </LinearLayout>
 

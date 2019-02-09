@@ -1,4 +1,4 @@
-package ie.bask;
+package ie.bask.models;
 
 import android.text.TextUtils;
 
@@ -16,7 +16,8 @@ public class Book implements Serializable {
     private String imageLink;
     private String description;
     private String publisher;
-    private String numPages;
+    private int numPages;
+    private String dateAdded;
 
     public String getBookId() {
         return bookId;
@@ -42,28 +43,56 @@ public class Book implements Serializable {
         return publisher;
     }
 
-    public String getNumPages() {
+    public int getNumPages() {
         return numPages;
     }
 
+    public String getDateAdded() {
+        return dateAdded;
+    }
+
+
+    public Book(String bookId, String author, String title, String imageLink, String description, String publisher, int numPages, String dateAdded) {
+        this.bookId = bookId;
+        this.author = author;
+        this.title = title;
+        this.imageLink = imageLink;
+        this.description = description;
+        this.publisher = publisher;
+        this.numPages = numPages;
+        this.dateAdded = dateAdded;
+    }
+
+    private Book(String bookId, String author, String title, String imageLink, String description, String publisher, int numPages) {
+        this.bookId = bookId;
+        this.author = author;
+        this.title = title;
+        this.imageLink = imageLink;
+        this.description = description;
+        this.publisher = publisher;
+        this.numPages = numPages;
+    }
 
     // Returns a Book given the expected JSON
-    public static Book fromJson(JSONObject jsonObject) {
-        Book book = new Book();
+    private static Book fromJson(JSONObject jsonObject) {
+        Book book;
+        String bookId, author, title, imageLink, description, publisher;
+        int numPages;
         try {
             // Deserialize json into object fields
-            book.bookId = jsonObject.has("id") ? jsonObject.getString("id") : "";
+            bookId = jsonObject.has("id") ? jsonObject.getString("id") : "";
             JSONObject volumeInfo = jsonObject.getJSONObject("volumeInfo");
-            book.title = volumeInfo.has("title") ? volumeInfo.getString("title") : "";
-            book.author = getAuthor(volumeInfo);
-            book.imageLink = volumeInfo.has("imageLinks") ? volumeInfo.getJSONObject("imageLinks").getString("smallThumbnail") : "";
-            book.publisher = volumeInfo.has("publisher") ? volumeInfo.getString("publisher") : "";
-            book.numPages = volumeInfo.has("pageCount") ? volumeInfo.getString("pageCount") : "";
-            book.description = volumeInfo.has("description") ? volumeInfo.getString("description") : "";
+            title = volumeInfo.has("title") ? volumeInfo.getString("title") : "";
+            author = getAuthor(volumeInfo);
+            imageLink = volumeInfo.has("imageLinks") ? volumeInfo.getJSONObject("imageLinks").getString("smallThumbnail") : "";
+            publisher = volumeInfo.has("publisher") ? volumeInfo.getString("publisher") : "Unknown";
+            numPages = volumeInfo.has("pageCount") ? volumeInfo.getInt("pageCount") : 0;
+            description = volumeInfo.has("description") ? volumeInfo.getString("description") : "No description available.";
         } catch (JSONException e) {
             e.printStackTrace();
             return null;
         }
+        book = new Book(bookId, author, title, imageLink, description, publisher, numPages);
         return book;
     }
 
@@ -84,9 +113,9 @@ public class Book implements Serializable {
 
     // Decodes array of book json results into Book objects
     public static ArrayList<Book> fromJson(JSONArray jsonArray) {
-        ArrayList<Book> books = new ArrayList<Book>(jsonArray.length());
+        ArrayList<Book> books = new ArrayList<>(jsonArray.length());
         for (int i = 0; i < jsonArray.length(); i++) {
-            JSONObject bookJson = null;
+            JSONObject bookJson;
             try {
                 bookJson = jsonArray.getJSONObject(i);
             } catch (Exception e) {

@@ -1,4 +1,4 @@
-package ie.bask;
+package ie.bask.adapters;
 
 import android.content.Context;
 import android.net.Uri;
@@ -9,7 +9,12 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
+
 import java.util.ArrayList;
+
+import ie.bask.R;
+import ie.bask.models.Book;
 
 public class BookAdapter extends ArrayAdapter<Book> {
 
@@ -17,6 +22,7 @@ public class BookAdapter extends ArrayAdapter<Book> {
         public ImageView ivCover;
         public TextView tvTitle;
         public TextView tvAuthor;
+        public TextView tvDateAdded;
     }
 
     public BookAdapter(Context context, ArrayList<Book> aBooks) {
@@ -37,18 +43,27 @@ public class BookAdapter extends ArrayAdapter<Book> {
             viewHolder.ivCover = convertView.findViewById(R.id.ivBookCover);
             viewHolder.tvTitle = convertView.findViewById(R.id.tvTitle);
             viewHolder.tvAuthor = convertView.findViewById(R.id.tvAuthor);
+            viewHolder.tvDateAdded = convertView.findViewById(R.id.tvDateAdded);
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
+
         // Populate the data into the template view using the Book object
         viewHolder.tvTitle.setText(book.getTitle());
         viewHolder.tvAuthor.setText(book.getAuthor());
 
-        // Use custom Picasso instance to fetch book cover
-        PicassoTrustAll.getInstance(getContext())
+        // Use Picasso to fetch book cover
+        Picasso.get()
                 .load(Uri.parse(book.getImageLink()))
-                .fit().centerInside().error(R.drawable.ic_nocover).into(viewHolder.ivCover);
+                .fit()
+                .centerInside()
+                .error(R.drawable.ic_nocover)
+                .into(viewHolder.ivCover);
+
+        if(book.getDateAdded()!=null){
+            viewHolder.tvDateAdded.setText(book.getDateAdded().toString());
+        }
 
         return convertView;
     }

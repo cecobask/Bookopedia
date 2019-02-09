@@ -1,11 +1,25 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="ie.bask.BookListActivity">
+    tools:context="ie.bask.activities.BookListActivity">
+
     <item
         android:id="@+id/action_search"
         android:title="@string/menu_search"
-        android:icon="@android:drawable/ic_menu_search"
-        app:showAsAction="always|collapseActionView"
+        android:icon="@drawable/ic_search"
+        app:showAsAction="collapseActionView|ifRoom"
         app:actionViewClass="android.support.v7.widget.SearchView" />
+
+    <item
+        android:id="@+id/action_home"
+        android:title="@string/menu_home"
+        android:icon="@drawable/ic_home"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_to_read"
+        android:title="@string/books_to_read"
+        android:icon="@drawable/ic_to_read"
+        app:showAsAction="ifRoom" />
+
 </menu>
