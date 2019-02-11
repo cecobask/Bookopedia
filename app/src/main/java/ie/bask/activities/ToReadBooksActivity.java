@@ -9,9 +9,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import ie.bask.R;
 import ie.bask.adapters.BookAdapter;
+import ie.bask.main.Base;
+import ie.bask.main.BookopediaApp;
 
 public class ToReadBooksActivity extends Base {
 
@@ -21,12 +24,12 @@ public class ToReadBooksActivity extends Base {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_to_read_books);
-
+        app = (BookopediaApp) getApplication();
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         lvBooksToRead = findViewById(R.id.lvToReadBooks);
         pbSearch = findViewById(R.id.pbSearch);
-        bookAdapter = new BookAdapter(this, booksToRead);
+        bookAdapter = new BookAdapter(this, app.booksToRead);
         lvBooksToRead.setAdapter(bookAdapter);
 
         setOnBookClickListener();
@@ -38,6 +41,7 @@ public class ToReadBooksActivity extends Base {
         final MenuItem searchItem = menu.findItem(R.id.action_search);
         final MenuItem homeItem = menu.findItem(R.id.action_home);
         final MenuItem toReadItem = menu.findItem(R.id.action_to_read);
+        final MenuItem clearBooksItem = menu.findItem(R.id.action_clear);
         toReadItem.setVisible(false);
         final SearchView searchView = (SearchView) searchItem.getActionView();
         searchView.setMaxWidth(android.R.attr.width);
@@ -48,12 +52,14 @@ public class ToReadBooksActivity extends Base {
             public void onViewDetachedFromWindow(View arg0) {
                 // search was detached/closed
                 homeItem.setVisible(true);
+                clearBooksItem.setVisible(true);
             }
 
             @Override
             public void onViewAttachedToWindow(View arg0) {
                 // search was opened
                 homeItem.setVisible(false);
+                clearBooksItem.setVisible(false);
             }
         });
 
@@ -66,8 +72,15 @@ public class ToReadBooksActivity extends Base {
 
         switch(id){
             case(R.id.action_home):
+                app.booksList.clear();
                 Intent homeIntent = new Intent(getApplicationContext(), BookListActivity.class);
                 startActivity(homeIntent);
+                break;
+            case(R.id.action_clear):
+                app.booksToReadDb.removeValue();
+                Toast.makeText(this, "All books deleted", Toast.LENGTH_SHORT).show();
+                bookAdapter.clear();
+                break;
         }
 
         return super.onOptionsItemSelected(item);

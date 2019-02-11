@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "1087167084706",
+    "firebase_url": "https://bookopedia.firebaseio.com",
+    "project_id": "bookopedia",
+    "storage_bucket": "bookopedia.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1087167084706:android:fc01bedbce67d5d2",
+        "android_client_info": {
+          "package_name": "ie.bask"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1087167084706-slgnb5d0l1cajsbgp0fjmlnjhi9a35l4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "ie.bask",
+            "certificate_hash": "981486db8dd52910d26916c72338a85f540a5189"
+          }
+        },
+        {
+          "client_id": "1087167084706-6lmgujcmi7fttldh08ueh929s40aeihj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBnGPP-qS-wP0iEXWfu-ivINqhF8HMfYv8"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1087167084706-6lmgujcmi7fttldh08ueh929s40aeihj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

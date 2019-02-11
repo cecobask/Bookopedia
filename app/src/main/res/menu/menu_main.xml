@@ -5,21 +5,27 @@
 
     <item
         android:id="@+id/action_search"
-        android:title="@string/menu_search"
         android:icon="@drawable/ic_search"
-        app:showAsAction="collapseActionView|ifRoom"
-        app:actionViewClass="android.support.v7.widget.SearchView" />
+        android:title="@string/menu_search"
+        app:actionViewClass="android.support.v7.widget.SearchView"
+        app:showAsAction="always|collapseActionView" />
 
     <item
         android:id="@+id/action_home"
-        android:title="@string/menu_home"
         android:icon="@drawable/ic_home"
-        app:showAsAction="ifRoom" />
+        android:title="@string/menu_home"
+        app:showAsAction="always" />
 
     <item
         android:id="@+id/action_to_read"
-        android:title="@string/books_to_read"
         android:icon="@drawable/ic_to_read"
+        android:title="@string/books_to_read"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_clear"
+        android:title="@string/clear_books"
+        android:icon="@drawable/ic_clear"
         app:showAsAction="ifRoom" />
 
 </menu>

@@ -1,4 +1,4 @@
-package ie.bask;
+package ie.bask.main;
 
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;

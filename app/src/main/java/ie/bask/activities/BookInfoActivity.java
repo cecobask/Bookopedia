@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -12,13 +13,15 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.squareup.picasso.Picasso;
-
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
+import ie.bask.PicassoTrustAll;
 import ie.bask.R;
+import ie.bask.main.Base;
+import ie.bask.main.BookopediaApp;
 import ie.bask.models.Book;
+
 
 public class BookInfoActivity extends Base {
     private ImageView ivBookCover;
@@ -37,6 +40,7 @@ public class BookInfoActivity extends Base {
         setContentView(R.layout.activity_book_info);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        app = (BookopediaApp) getApplication();
         ivBookCover = findViewById(R.id.ivBookCover);
         tvTitle = findViewById(R.id.tvTitle);
         tvAuthor = findViewById(R.id.tvAuthor);
@@ -49,6 +53,8 @@ public class BookInfoActivity extends Base {
         // Use the book to populate the data into our views
         Book book = (Book) getIntent().getSerializableExtra("book_info_key");
         loadBook(book);
+
+//        loadBooks();
 
         // Listen for clicks on the Add to Read List button
         setBookToReadListener();
@@ -63,13 +69,9 @@ public class BookInfoActivity extends Base {
                 String currentDate = ZonedDateTime.now().format(DateTimeFormatter.RFC_1123_DATE_TIME);
                 Book bookToRead = new Book(book.getBookId(),book.getAuthor(),book.getTitle(),book.getImageLink(),
                         book.getDescription(),book.getPublisher(),book.getNumPages(),currentDate);
-                booksToRead.add(bookToRead);
+                addBookToRead(bookToRead);
                 MenuItem toReadItem = menu.findItem(R.id.action_to_read);
                 toReadItem.setVisible(true);
-
-                Toast.makeText(getApplicationContext(),
-                        "Added to TO READ!",
-                        Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -82,7 +84,7 @@ public class BookInfoActivity extends Base {
             btnToRead.setVisibility(View.VISIBLE);
             tvDateAdded.setVisibility(View.GONE);
             // Populate data
-            Picasso.get()
+            PicassoTrustAll.getInstance(getApplicationContext())
                     .load(Uri.parse(book.getImageLink()))
                     .fit()
                     .centerInside()
@@ -101,7 +103,7 @@ public class BookInfoActivity extends Base {
             // Populate data
             tvDateAdded.setText(String.format(getResources().getString(R.string.added_on), book.getDateAdded()));
 
-            Picasso.get()
+            PicassoTrustAll.getInstance(getApplicationContext())
                     .load(Uri.parse(book.getImageLink()))
                     .fit()
                     .centerInside()
@@ -121,10 +123,12 @@ public class BookInfoActivity extends Base {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         final MenuItem searchItem = menu.findItem(R.id.action_search);
         final MenuItem toReadItem = menu.findItem(R.id.action_to_read);
+        final MenuItem clearBooksItem = menu.findItem(R.id.action_clear);
 
-        // Hide Search and To Read menu items
+        // Hide menu items
         searchItem.setVisible(false);
-        if(booksToRead.isEmpty()){
+        clearBooksItem.setVisible(false);
+        if(app.booksToRead.isEmpty()){
             toReadItem.setVisible(false);
         }
 
@@ -138,6 +142,7 @@ public class BookInfoActivity extends Base {
 
         switch(id){
             case(R.id.action_home):
+                app.booksList.clear();
                 Intent goHome = new Intent(getApplicationContext(),BookListActivity.class);
                 startActivity(goHome);
                 break;
@@ -147,5 +152,13 @@ public class BookInfoActivity extends Base {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void addBookToRead(Book book) {
+        // Adding the book to Firebase Database
+        app.booksToReadDb.child(book.getBookId()).setValue(book);
+        app.booksToRead.add(book);
+        Log.e("Bookopedia", book.toString());
+        Toast.makeText(getApplicationContext(),"Book added to TO READ list", Toast.LENGTH_SHORT).show();
     }
 }

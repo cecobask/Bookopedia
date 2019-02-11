@@ -1,11 +1,8 @@
-package ie.bask.activities;
+package ie.bask.main;
 
-import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -15,17 +12,13 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-
 import cz.msebera.android.httpclient.Header;
-import ie.bask.BookClient;
 import ie.bask.adapters.BookAdapter;
 import ie.bask.models.Book;
 
 public class Base extends AppCompatActivity {
 
-    public static ArrayList<Book> booksList = new ArrayList<>();
-    public static ArrayList<Book> booksToRead = new ArrayList<>();
+    public BookopediaApp app;
     public ProgressBar pbSearch;
     public BookAdapter bookAdapter;
     public TextView tvNoResults;
@@ -34,7 +27,7 @@ public class Base extends AppCompatActivity {
     // Converts them into an array of book objects and adds them to the adapter
     public void getBooks(String query) {
         // Show progress bar if search query is not empty
-        if(query.length()>0) pbSearch.setVisibility(View.VISIBLE);
+        if (query.length() > 0) pbSearch.setVisibility(View.VISIBLE);
 
         BookClient client = new BookClient();
         client.getBooks(query, new JsonHttpResponseHandler() {
@@ -45,14 +38,14 @@ public class Base extends AppCompatActivity {
                     pbSearch.setVisibility(View.GONE);
                     tvNoResults.setText(null);
                     JSONArray items;
-                    if(response.getInt("totalItems")!=0) {
+                    if (response.getInt("totalItems") != 0) {
                         // Get the items json array
                         items = response.getJSONArray("items");
                         // Parse json array into array of Book objects
-                        booksList = Book.fromJson(items);
+                        app.booksList = Book.fromJson(items);
                         bookAdapter.clear();
                         // Load Book objects into the adapter
-                        for (Book book : booksList) {
+                        for (Book book : app.booksList) {
                             bookAdapter.add(book);
                         }
                         bookAdapter.notifyDataSetChanged();
@@ -69,9 +62,9 @@ public class Base extends AppCompatActivity {
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                 super.onFailure(statusCode, headers, throwable, errorResponse);
-                Log.d("Failed: ", ""+statusCode);
+                Log.d("Failed: ", "" + statusCode);
                 Log.d("Error: ", "" + throwable);
-                Log.d("JsonObject: ",  "" + errorResponse);
+                Log.d("JsonObject: ", "" + errorResponse);
             }
         });
     }

@@ -13,6 +13,8 @@ import android.widget.ListView;
 
 import ie.bask.R;
 import ie.bask.adapters.BookAdapter;
+import ie.bask.main.Base;
+import ie.bask.main.BookopediaApp;
 
 
 public class BookListActivity extends Base {
@@ -27,10 +29,11 @@ public class BookListActivity extends Base {
         setContentView(R.layout.activity_book_list);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        app = (BookopediaApp) getApplication();
         lvBooks = findViewById(R.id.lvBooks);
         pbSearch = findViewById(R.id.pbSearch);
         tvNoResults = findViewById(R.id.tvNoResults);
-        bookAdapter = new BookAdapter(this, booksList);
+        bookAdapter = new BookAdapter(this, app.booksList);
         lvBooks.setAdapter(bookAdapter);
 
         setOnBookClickListener();
@@ -42,7 +45,25 @@ public class BookListActivity extends Base {
         final MenuItem searchItem = menu.findItem(R.id.action_search);
         final MenuItem homeItem = menu.findItem(R.id.action_home);
         final MenuItem toReadItem = menu.findItem(R.id.action_to_read);
+        final MenuItem clearBooksItem = menu.findItem(R.id.action_clear);
         final SearchView searchView = (SearchView) searchItem.getActionView();
+
+        // Trick to give enough time for response from Firebase
+        handler.removeCallbacks(runnable);
+        runnable = new Runnable() {
+            @Override
+            public void run() {
+                clearBooksItem.setVisible(false);
+                if (app.booksToRead.isEmpty()) {
+                    toReadItem.setVisible(false);
+                } else {
+                    toReadItem.setVisible(true);
+                }
+            }
+        };
+        // Delay MenuItems population
+        handler.postDelayed(runnable, 350);
+
         searchView.setMaxWidth(android.R.attr.width);
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -58,7 +79,6 @@ public class BookListActivity extends Base {
                 BookListActivity.this.setTitle(query);
                 return true;
             }
-
             @Override
             public boolean onQueryTextChange(final String query) {
                 // Remove all previous callbacks
@@ -84,11 +104,12 @@ public class BookListActivity extends Base {
             public void onViewDetachedFromWindow(View arg0) {
                 // search was detached/closed
                 homeItem.setVisible(true);
-                if(booksToRead.isEmpty()){
+                if (app.booksToRead.isEmpty()) {
                     toReadItem.setVisible(false);
+                } else {
+                    toReadItem.setVisible(true);
                 }
             }
-
             @Override
             public void onViewAttachedToWindow(View arg0) {
                 // search was opened
@@ -96,10 +117,6 @@ public class BookListActivity extends Base {
                 toReadItem.setVisible(false);
             }
         });
-
-        if(booksToRead.isEmpty()){
-            toReadItem.setVisible(false);
-        }
 
         return true;
     }
@@ -112,8 +129,7 @@ public class BookListActivity extends Base {
             case (R.id.action_home):
                 // Clear ListView and hide ProgressBar
                 BookListActivity.this.setTitle(R.string.app_name);
-                booksList.clear();
-                bookAdapter.clear();
+                app.booksList.clear();
                 pbSearch.setVisibility(View.GONE);
                 tvNoResults.setText(null);
                 break;

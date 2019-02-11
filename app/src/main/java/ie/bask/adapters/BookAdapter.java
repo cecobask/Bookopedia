@@ -9,10 +9,9 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.squareup.picasso.Picasso;
-
 import java.util.ArrayList;
 
+import ie.bask.PicassoTrustAll;
 import ie.bask.R;
 import ie.bask.models.Book;
 
@@ -53,13 +52,18 @@ public class BookAdapter extends ArrayAdapter<Book> {
         viewHolder.tvTitle.setText(book.getTitle());
         viewHolder.tvAuthor.setText(book.getAuthor());
 
-        // Use Picasso to fetch book cover
-        Picasso.get()
+        // Use custom Picasso instance to fetch book cover
+        PicassoTrustAll.getInstance(getContext())
                 .load(Uri.parse(book.getImageLink()))
-                .fit()
-                .centerInside()
-                .error(R.drawable.ic_nocover)
-                .into(viewHolder.ivCover);
+                .fit().centerInside().error(R.drawable.ic_nocover).into(viewHolder.ivCover);
+
+//        // Use Picasso to fetch book cover
+//        Picasso.get()
+//                .load(Uri.parse(book.getImageLink()))
+//                .fit()
+//                .centerInside()
+//                .error(R.drawable.ic_nocover)
+//                .into(viewHolder.ivCover);
 
         if(book.getDateAdded()!=null){
             viewHolder.tvDateAdded.setText(book.getDateAdded().toString());
