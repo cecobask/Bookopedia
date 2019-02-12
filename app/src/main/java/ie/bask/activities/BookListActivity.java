@@ -46,18 +46,6 @@ public class BookListActivity extends Base {
         rvBooks = findViewById(R.id.rvBooks);
         rvBooks.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
 
-        Log.v("Bookopedia", ""+app.booksList.size());
-        // Trick to give enough time for response from Firebase
-        handler.removeCallbacks(runnable);
-        runnable = new Runnable() {
-            @Override
-            public void run() {
-                Log.v("Bookopedia", ""+app.booksList.size());
-            }
-        };
-        // Delay MenuItems population
-        handler.postDelayed(runnable, 3000);
-
     }
 
     @Override
@@ -167,7 +155,6 @@ public class BookListActivity extends Base {
     @Override
     protected void onResume() {
         super.onResume();
-        Log.v("Bookopedia", "" + app.booksList.size());
     }
 
     // Executes an API call to the Google Books search endpoint, parses the results
