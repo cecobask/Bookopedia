@@ -10,8 +10,8 @@
     <include layout="@layout/toolbar"
         android:id="@+id/toolbar"/>
 
-    <ListView
-        android:id="@+id/lvBooks"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rvBooks"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="56dp"

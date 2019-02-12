@@ -1,74 +1,71 @@
 package ie.bask.adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
+import android.support.annotation.NonNull;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import java.util.ArrayList;
 
 import ie.bask.PicassoTrustAll;
 import ie.bask.R;
+import ie.bask.activities.BookInfoActivity;
 import ie.bask.models.Book;
 
-public class BookAdapter extends ArrayAdapter<Book> {
+public class BookAdapter extends RecyclerView.Adapter<BookViewHolder>{
 
-    private static class ViewHolder {
-        public ImageView ivCover;
-        public TextView tvTitle;
-        public TextView tvAuthor;
-        public TextView tvDateAdded;
+    private ArrayList<Book> booksArray;
+    private LayoutInflater mInflater;
+
+    // data is passed into the constructor
+    public BookAdapter(Context context, ArrayList<Book> booksArray) {
+        this.mInflater = LayoutInflater.from(context);
+        this.booksArray = booksArray;
     }
 
-    public BookAdapter(Context context, ArrayList<Book> aBooks) {
-        super(context, 0, aBooks);
-    }
 
-    // Translates a particular Book object given a position
-    // into a relevant row within an AdapterView
+    @NonNull
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        // Get the data item for this position
-        final Book book = getItem(position);
-        ViewHolder viewHolder;
-        if (convertView == null) {
-            viewHolder = new ViewHolder();
-            LayoutInflater inflater = (LayoutInflater)getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = inflater.inflate(R.layout.book_item, parent, false);
-            viewHolder.ivCover = convertView.findViewById(R.id.ivBookCover);
-            viewHolder.tvTitle = convertView.findViewById(R.id.tvTitle);
-            viewHolder.tvAuthor = convertView.findViewById(R.id.tvAuthor);
-            viewHolder.tvDateAdded = convertView.findViewById(R.id.tvDateAdded);
-            convertView.setTag(viewHolder);
-        } else {
-            viewHolder = (ViewHolder) convertView.getTag();
-        }
+    public BookViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = mInflater.inflate(R.layout.book_item, parent, false);
 
+        return new BookViewHolder(view);
+    }
+
+    @Override
+    public void onBindViewHolder(final BookViewHolder holder, final int position) {
+        Book book = booksArray.get(position);
         // Populate the data into the template view using the Book object
-        viewHolder.tvTitle.setText(book.getTitle());
-        viewHolder.tvAuthor.setText(book.getAuthor());
+        holder.tvTitle.setText(book.getTitle());
+        holder.tvAuthor.setText(book.getAuthor());
 
         // Use custom Picasso instance to fetch book cover
-        PicassoTrustAll.getInstance(getContext())
+        PicassoTrustAll.getInstance(holder.ivCover.getContext())
                 .load(Uri.parse(book.getImageLink()))
-                .fit().centerInside().error(R.drawable.ic_nocover).into(viewHolder.ivCover);
-
-//        // Use Picasso to fetch book cover
-//        Picasso.get()
-//                .load(Uri.parse(book.getImageLink()))
-//                .fit()
-//                .centerInside()
-//                .error(R.drawable.ic_nocover)
-//                .into(viewHolder.ivCover);
+                .fit().centerInside().error(R.drawable.ic_nocover).into(holder.ivCover);
 
         if(book.getDateAdded()!=null){
-            viewHolder.tvDateAdded.setText(book.getDateAdded().toString());
+            holder.tvDateAdded.setText(book.getDateAdded());
         }
 
-        return convertView;
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Launch the BookInfoActivity activity passing book as an extra
+                Intent intent = new Intent(holder.tvTitle.getContext(), BookInfoActivity.class);
+                intent.putExtra("book_info_key", booksArray.get(position));
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                holder.tvTitle.getContext().startActivity(intent);
+            }
+        });
+    }
+
+    @Override
+    public int getItemCount() {
+        return booksArray.size();
     }
 }

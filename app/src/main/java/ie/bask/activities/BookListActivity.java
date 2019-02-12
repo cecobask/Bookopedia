@@ -3,25 +3,36 @@ package ie.bask.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ListView;
 
+import com.loopj.android.http.JsonHttpResponseHandler;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import cz.msebera.android.httpclient.Header;
 import ie.bask.R;
 import ie.bask.adapters.BookAdapter;
 import ie.bask.main.Base;
+import ie.bask.main.BookClient;
 import ie.bask.main.BookopediaApp;
+import ie.bask.models.Book;
 
 
 public class BookListActivity extends Base {
 
     private Handler handler = new Handler();
     private Runnable runnable;
-    private ListView lvBooks;
+    private RecyclerView rvBooks;
+    private BookAdapter bookAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,13 +41,23 @@ public class BookListActivity extends Base {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         app = (BookopediaApp) getApplication();
-        lvBooks = findViewById(R.id.lvBooks);
         pbSearch = findViewById(R.id.pbSearch);
         tvNoResults = findViewById(R.id.tvNoResults);
-        bookAdapter = new BookAdapter(this, app.booksList);
-        lvBooks.setAdapter(bookAdapter);
+        rvBooks = findViewById(R.id.rvBooks);
+        rvBooks.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
 
-        setOnBookClickListener();
+        Log.v("Bookopedia", ""+app.booksList.size());
+        // Trick to give enough time for response from Firebase
+        handler.removeCallbacks(runnable);
+        runnable = new Runnable() {
+            @Override
+            public void run() {
+                Log.v("Bookopedia", ""+app.booksList.size());
+            }
+        };
+        // Delay MenuItems population
+        handler.postDelayed(runnable, 3000);
+
     }
 
     @Override
@@ -79,6 +100,7 @@ public class BookListActivity extends Base {
                 BookListActivity.this.setTitle(query);
                 return true;
             }
+
             @Override
             public boolean onQueryTextChange(final String query) {
                 // Remove all previous callbacks
@@ -110,6 +132,7 @@ public class BookListActivity extends Base {
                     toReadItem.setVisible(true);
                 }
             }
+
             @Override
             public void onViewAttachedToWindow(View arg0) {
                 // search was opened
@@ -141,16 +164,52 @@ public class BookListActivity extends Base {
         return super.onOptionsItemSelected(item);
     }
 
-    public void setOnBookClickListener() {
-        lvBooks.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.v("Bookopedia", "" + app.booksList.size());
+    }
+
+    // Executes an API call to the Google Books search endpoint, parses the results
+    // Converts them into an array of book objects and adds them to the adapter
+    public void getBooks(String query) {
+        // Show progress bar if search query is not empty
+        if (query.length() > 0) pbSearch.setVisibility(View.VISIBLE);
+
+        BookClient client = new BookClient();
+        client.getBooks(query, new JsonHttpResponseHandler() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                // Launch the BookInfoActivity activity passing book as an extra
-                Intent intent = new Intent(getApplicationContext(), BookInfoActivity.class);
-                intent.putExtra("book_info_key", bookAdapter.getItem(position));
-                startActivity(intent);
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                try {
+                    // Hide progress bar and TextView
+                    pbSearch.setVisibility(View.GONE);
+                    tvNoResults.setText(null);
+                    JSONArray items;
+                    if (response.getInt("totalItems") != 0) {
+                        // Get the items json array
+                        items = response.getJSONArray("items");
+                        // Parse json array into array of Book objects
+                        app.booksList = Book.fromJson(items);
+                        bookAdapter = new BookAdapter(getApplicationContext(), app.booksList);
+                        rvBooks.setAdapter(bookAdapter);
+
+                    } else {
+                        app.booksList.clear();
+                        tvNoResults.setText("No results found.\nSorry for the inconvenience.");
+                    }
+                } catch (JSONException e) {
+                    pbSearch.setVisibility(View.GONE);
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                super.onFailure(statusCode, headers, throwable, errorResponse);
+                Log.d("Failed: ", "" + statusCode);
+                Log.d("Error: ", "" + throwable);
+                Log.d("JsonObject: ", "" + errorResponse);
             }
         });
     }
-
 }
