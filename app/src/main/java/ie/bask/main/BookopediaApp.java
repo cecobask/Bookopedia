@@ -64,7 +64,7 @@ public class BookopediaApp extends Application {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                Log.e("Bookopedia", ""+databaseError);
+                Log.e("Bookopedia", "" + databaseError);
             }
         });
     }

@@ -55,6 +55,7 @@ public class BookListActivity extends Base {
         final MenuItem homeItem = menu.findItem(R.id.action_home);
         final MenuItem toReadItem = menu.findItem(R.id.action_to_read);
         final MenuItem clearBooksItem = menu.findItem(R.id.action_clear);
+        final MenuItem deleteBookItem = menu.findItem(R.id.action_delete);
         final SearchView searchView = (SearchView) searchItem.getActionView();
 
         // Trick to give enough time for response from Firebase
@@ -63,6 +64,7 @@ public class BookListActivity extends Base {
             @Override
             public void run() {
                 clearBooksItem.setVisible(false);
+                deleteBookItem.setVisible(false);
                 if (app.booksToRead.isEmpty()) {
                     toReadItem.setVisible(false);
                 } else {

@@ -18,7 +18,6 @@ import javax.net.ssl.X509TrustManager;
  * This is a customised Picasso instance.
  * Picasso was having problems fetching images using HTTPS protocol.
  * This code allows Picasso to trust all certs.
- *
  */
 public class PicassoTrustAll {
 

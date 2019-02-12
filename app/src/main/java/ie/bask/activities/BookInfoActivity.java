@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -54,21 +53,18 @@ public class BookInfoActivity extends Base {
         Book book = (Book) getIntent().getSerializableExtra("book_info_key");
         loadBook(book);
 
-//        loadBooks();
-
         // Listen for clicks on the Add to Read List button
-        setBookToReadListener();
+        setBookToReadListener(book);
     }
 
-    private void setBookToReadListener() {
+    private void setBookToReadListener(final Book book) {
         btnToRead.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 // Use the book to populate the data into our views
-                Book book = (Book) getIntent().getSerializableExtra("book_info_key");
                 String currentDate = ZonedDateTime.now().format(DateTimeFormatter.RFC_1123_DATE_TIME);
-                Book bookToRead = new Book(book.getBookId(),book.getAuthor(),book.getTitle(),book.getImageLink(),
-                        book.getDescription(),book.getPublisher(),book.getNumPages(),currentDate);
+                Book bookToRead = new Book(book.getBookId(), book.getAuthor(), book.getTitle(), book.getImageLink(),
+                        book.getDescription(), book.getPublisher(), book.getNumPages(), currentDate);
                 addBookToRead(bookToRead);
                 MenuItem toReadItem = menu.findItem(R.id.action_to_read);
                 toReadItem.setVisible(true);
@@ -78,7 +74,7 @@ public class BookInfoActivity extends Base {
 
     // Populate data for the book
     private void loadBook(Book book) {
-        if(book.getDateAdded()==null) {
+        if (book.getDateAdded() == null) {
             //change activity title
             this.setTitle(book.getTitle());
             btnToRead.setVisibility(View.VISIBLE);
@@ -124,11 +120,15 @@ public class BookInfoActivity extends Base {
         final MenuItem searchItem = menu.findItem(R.id.action_search);
         final MenuItem toReadItem = menu.findItem(R.id.action_to_read);
         final MenuItem clearBooksItem = menu.findItem(R.id.action_clear);
+        final MenuItem deleteBookItem = menu.findItem(R.id.action_delete);
 
         // Hide menu items
+        if (getIntent().getStringExtra("ToReadContext") == null) {
+            deleteBookItem.setVisible(false);
+        }
         searchItem.setVisible(false);
         clearBooksItem.setVisible(false);
-        if(app.booksToRead.isEmpty()){
+        if (app.booksToRead.isEmpty()) {
             toReadItem.setVisible(false);
         }
 
@@ -140,15 +140,26 @@ public class BookInfoActivity extends Base {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        switch(id){
-            case(R.id.action_home):
+        switch (id) {
+            case (R.id.action_home):
                 app.booksList.clear();
-                Intent goHome = new Intent(getApplicationContext(),BookListActivity.class);
+                Intent goHome = new Intent(getApplicationContext(), BookListActivity.class);
                 startActivity(goHome);
                 break;
             case (R.id.action_to_read):
                 Intent toReadIntent = new Intent(getApplicationContext(), ToReadBooksActivity.class);
                 startActivity(toReadIntent);
+                break;
+            case (R.id.action_delete):
+                // Remove book from Firebase Database and local ArrayList
+                Book book = (Book) getIntent().getSerializableExtra("book_info_key");
+                app.booksToRead.remove(book);
+                app.booksToReadDb.child(book.getBookId()).removeValue();
+
+                // Close activity
+                finishAffinity();
+                startActivity(new Intent(getApplicationContext(), ToReadBooksActivity.class));
+                break;
         }
 
         return super.onOptionsItemSelected(item);
@@ -158,7 +169,6 @@ public class BookInfoActivity extends Base {
         // Adding the book to Firebase Database
         app.booksToReadDb.child(book.getBookId()).setValue(book);
         app.booksToRead.add(book);
-        Log.e("Bookopedia", book.toString());
-        Toast.makeText(getApplicationContext(),"Book added to TO READ list", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getApplicationContext(), "Book added to TO READ list", Toast.LENGTH_SHORT).show();
     }
 }

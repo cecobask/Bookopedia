@@ -11,5 +11,4 @@ public class Base extends AppCompatActivity {
     public TextView tvNoResults;
 
 
-
 }

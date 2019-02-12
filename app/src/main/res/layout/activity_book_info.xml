@@ -6,17 +6,18 @@
     android:orientation="vertical"
     tools:context=".activities.BookListActivity">
 
-    <include layout="@layout/toolbar"
-        android:id="@+id/toolbar"/>
+    <include
+        android:id="@+id/toolbar"
+        layout="@layout/toolbar" />
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <LinearLayout
-            android:gravity="center_vertical|center_horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="center_vertical|center_horizontal"
             android:orientation="vertical">
 
             <ImageView
@@ -36,8 +37,8 @@
                 android:paddingLeft="10dp"
                 android:paddingRight="10dp"
                 android:textAlignment="center"
-                android:textSize="20sp"
-                android:textColor="@color/md_grey_700"/>
+                android:textColor="@color/md_grey_700"
+                android:textSize="20sp" />
 
             <TextView
                 android:id="@+id/tvTitle"
@@ -47,8 +48,8 @@
                 android:paddingLeft="10dp"
                 android:paddingRight="10dp"
                 android:textAlignment="center"
-                android:textStyle="bold"
-                android:textSize="32sp" />
+                android:textSize="32sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/tvAuthor"
@@ -58,8 +59,8 @@
                 android:paddingLeft="10dp"
                 android:paddingRight="10dp"
                 android:textAlignment="center"
-                android:textStyle="bold"
-                android:textSize="22sp" />
+                android:textSize="22sp"
+                android:textStyle="bold" />
 
             <View
                 android:id="@+id/hrView"
@@ -88,9 +89,9 @@
                 android:layout_height="0dp"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
+                android:layout_weight="0.5"
                 android:textAlignment="center"
-                android:textSize="14sp"
-                android:layout_weight="0.5" />
+                android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/tvPageCount"

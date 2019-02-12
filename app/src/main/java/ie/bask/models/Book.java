@@ -19,40 +19,8 @@ public class Book implements Serializable {
     private int numPages;
     private String dateAdded;
 
-    public String getBookId() {
-        return bookId;
+    public Book() {
     }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public String getAuthor() {
-        return author;
-    }
-
-    public String getImageLink() {
-        return imageLink;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public String getPublisher() {
-        return publisher;
-    }
-
-    public int getNumPages() {
-        return numPages;
-    }
-
-    public String getDateAdded() {
-        return dateAdded;
-    }
-
-
-    public Book(){}
 
     public Book(String bookId, String author, String title, String imageLink, String description, String publisher, int numPages, String dateAdded) {
         this.bookId = bookId;
@@ -130,6 +98,38 @@ public class Book implements Serializable {
             }
         }
         return books;
+    }
+
+    public String getBookId() {
+        return bookId;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public String getImageLink() {
+        return imageLink;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public String getPublisher() {
+        return publisher;
+    }
+
+    public int getNumPages() {
+        return numPages;
+    }
+
+    public String getDateAdded() {
+        return dateAdded;
     }
 
 }

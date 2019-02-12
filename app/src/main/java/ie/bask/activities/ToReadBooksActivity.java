@@ -46,7 +46,7 @@ public class ToReadBooksActivity extends Base {
                         .setQuery(FirebaseDatabase.getInstance().getReference("booksToRead"), Book.class)
                         .build();
 
-        adapter = new FirebaseRecyclerAdapter<Book,BookViewHolder>(options) {
+        adapter = new FirebaseRecyclerAdapter<Book, BookViewHolder>(options) {
             @Override
             protected void onBindViewHolder(@NonNull BookViewHolder holder, final int position, @NonNull Book book) {
                 book = getItem(position);
@@ -59,7 +59,7 @@ public class ToReadBooksActivity extends Base {
                         .load(Uri.parse(book.getImageLink()))
                         .fit().centerInside().error(R.drawable.ic_nocover).into(holder.ivCover);
 
-                if(book.getDateAdded()!=null){
+                if (book.getDateAdded() != null) {
                     holder.tvDateAdded.setText(book.getDateAdded());
                 }
 
@@ -67,9 +67,10 @@ public class ToReadBooksActivity extends Base {
                     @Override
                     public void onClick(View view) {
                         // Launch the BookInfoActivity activity passing book as an extra
-                Intent intent = new Intent(getApplicationContext(), BookInfoActivity.class);
-                intent.putExtra("book_info_key", getItem(position));
-                startActivity(intent);
+                        Intent intent = new Intent(getApplicationContext(), BookInfoActivity.class);
+                        intent.putExtra("book_info_key", getItem(position));
+                        intent.putExtra("ToReadContext", "ToReadContext");
+                        startActivity(intent);
                     }
                 });
             }
@@ -96,7 +97,9 @@ public class ToReadBooksActivity extends Base {
         final MenuItem homeItem = menu.findItem(R.id.action_home);
         final MenuItem toReadItem = menu.findItem(R.id.action_to_read);
         final MenuItem clearBooksItem = menu.findItem(R.id.action_clear);
+        final MenuItem deleteBookItem = menu.findItem(R.id.action_delete);
         toReadItem.setVisible(false);
+        deleteBookItem.setVisible(false);
         final SearchView searchView = (SearchView) searchItem.getActionView();
         searchView.setMaxWidth(android.R.attr.width);
 
@@ -125,12 +128,12 @@ public class ToReadBooksActivity extends Base {
         int id = item.getItemId();
         Intent homeIntent = new Intent(getApplicationContext(), BookListActivity.class);
 
-        switch(id){
-            case(R.id.action_home):
+        switch (id) {
+            case (R.id.action_home):
                 app.booksList.clear();
                 startActivity(homeIntent);
                 break;
-            case(R.id.action_clear):
+            case (R.id.action_clear):
                 app.booksToReadDb.removeValue();
                 app.booksToRead.clear();
                 Toast.makeText(this, "All books deleted", Toast.LENGTH_SHORT).show();
@@ -145,7 +148,7 @@ public class ToReadBooksActivity extends Base {
     @Override
     protected void onStart() {
         super.onStart();
-        if(adapter!=null){
+        if (adapter != null) {
             adapter.startListening();
         }
     }
@@ -153,7 +156,7 @@ public class ToReadBooksActivity extends Base {
     @Override
     protected void onResume() {
         super.onResume();
-        if(adapter!=null) {
+        if (adapter != null) {
             adapter.startListening();
         }
     }
@@ -161,7 +164,7 @@ public class ToReadBooksActivity extends Base {
     @Override
     protected void onStop() {
         super.onStop();
-        if(adapter!=null) {
+        if (adapter != null) {
             adapter.stopListening();
         }
     }

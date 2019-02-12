@@ -16,7 +16,7 @@ import ie.bask.R;
 import ie.bask.activities.BookInfoActivity;
 import ie.bask.models.Book;
 
-public class BookAdapter extends RecyclerView.Adapter<BookViewHolder>{
+public class BookAdapter extends RecyclerView.Adapter<BookViewHolder> {
 
     private ArrayList<Book> booksArray;
     private LayoutInflater mInflater;
@@ -48,7 +48,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookViewHolder>{
                 .load(Uri.parse(book.getImageLink()))
                 .fit().centerInside().error(R.drawable.ic_nocover).into(holder.ivCover);
 
-        if(book.getDateAdded()!=null){
+        if (book.getDateAdded() != null) {
             holder.tvDateAdded.setText(book.getDateAdded());
         }
 
