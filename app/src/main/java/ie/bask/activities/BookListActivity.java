@@ -73,7 +73,7 @@ public class BookListActivity extends Base {
             }
         };
         // Delay MenuItems population
-        handler.postDelayed(runnable, 350);
+        handler.postDelayed(runnable, 500);
 
         searchView.setMaxWidth(android.R.attr.width);
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {

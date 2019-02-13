@@ -18,11 +18,13 @@ public class Book implements Serializable {
     private String publisher;
     private int numPages;
     private String dateAdded;
+    private String notes;
 
     public Book() {
     }
 
-    public Book(String bookId, String author, String title, String imageLink, String description, String publisher, int numPages, String dateAdded) {
+    public Book(String bookId, String author, String title, String imageLink, String description,
+                String publisher, int numPages, String dateAdded, String notes) {
         this.bookId = bookId;
         this.author = author;
         this.title = title;
@@ -31,6 +33,7 @@ public class Book implements Serializable {
         this.publisher = publisher;
         this.numPages = numPages;
         this.dateAdded = dateAdded;
+        this.notes = notes;
     }
 
     private Book(String bookId, String author, String title, String imageLink, String description, String publisher, int numPages) {
@@ -132,4 +135,7 @@ public class Book implements Serializable {
         return dateAdded;
     }
 
+    public String getNotes() {
+        return notes;
+    }
 }

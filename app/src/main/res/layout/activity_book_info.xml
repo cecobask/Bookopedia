@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".activities.BookListActivity">
+    tools:context=".activities.BookInfoActivity">
 
     <include
         android:id="@+id/toolbar"
@@ -64,9 +64,11 @@
 
             <View
                 android:id="@+id/hrView"
-                android:layout_width="280dp"
-                android:layout_height="1px"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginStart="20dp"
                 android:layout_marginTop="8dp"
+                android:layout_marginEnd="20dp"
                 android:background="@android:color/darker_gray" />
 
             <Button
@@ -80,7 +82,9 @@
             <View
                 android:id="@+id/hrView2"
                 android:layout_width="match_parent"
-                android:layout_height="1px"
+                android:layout_height="1dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
                 android:background="@android:color/darker_gray" />
 
             <TextView
@@ -113,6 +117,46 @@
                 android:justificationMode="inter_word"
                 android:textSize="14sp"
                 android:textStyle="italic" />
+
+            <View
+                android:id="@+id/hrView3"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:background="@android:color/darker_gray" />
+
+            <TextView
+                android:id="@+id/tvNotesLabel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="20dp"
+                android:text="@string/notesLabel"
+                android:textAlignment="center"
+                android:textColor="@color/md_black_1000"
+                android:textIsSelectable="false"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/btnAddNotes"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:text="@string/btnAddNotes"/>
+
+            <TextView
+                android:id="@+id/tvNotes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginBottom="8dp"
+                android:textSize="16sp"
+                android:text="@string/tvNotes"/>
 
         </LinearLayout>
 

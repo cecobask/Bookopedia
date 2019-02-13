@@ -14,4 +14,9 @@
     <string name="added_on">Added on: %1$s</string>
     <string name="clear_books">Clear books</string>
     <string name="delete_book">Delete book</string>
+    <string name="notes_hint">Enter your book notes here.</string>
+    <string name="btnAddNotes">Add notes</string>
+    <string name="notesLabel">Notes</string>
+    <string name="tvNotes">No notes yet. Add notes by clicking on the Add notes button.</string>
+    <string name="notes_dialog_message">Enter your notes here:</string>
 </resources>
