@@ -17,8 +17,9 @@ import ie.bask.models.Book;
 public class BookopediaApp extends Application {
 
     public ArrayList<Book> booksToRead = new ArrayList<>();
-    public ArrayList<Book> booksList = new ArrayList<>();
+    public ArrayList<Book> booksResults = new ArrayList<>();
     public DatabaseReference booksToReadDb;
+    public DatabaseReference bookResultsDb;
 
 
     // Called when the application is starting, before any other application objects have been created.
@@ -46,6 +47,7 @@ public class BookopediaApp extends Application {
     public void loadBooks() {
         // Getting the reference of booksToRead node
         booksToReadDb = FirebaseDatabase.getInstance().getReference("booksToRead");
+        bookResultsDb = FirebaseDatabase.getInstance().getReference("bookResults");
         // Attaching value event listener
         booksToReadDb.addValueEventListener(new ValueEventListener() {
             @Override

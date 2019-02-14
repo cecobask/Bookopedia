@@ -1,35 +1,24 @@
 package ie.bask.activities;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.firebase.ui.database.FirebaseRecyclerAdapter;
-import com.firebase.ui.database.FirebaseRecyclerOptions;
-import com.google.firebase.database.FirebaseDatabase;
-
-import ie.bask.PicassoTrustAll;
 import ie.bask.R;
-import ie.bask.adapters.BookViewHolder;
+import ie.bask.adapters.BookAdapter;
 import ie.bask.main.Base;
 import ie.bask.main.BookopediaApp;
-import ie.bask.models.Book;
 
 public class ToReadBooksActivity extends Base {
 
-    private RecyclerView rvBooksToRead;
-    private FirebaseRecyclerAdapter adapter;
+    RecyclerView rvBooksToRead;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,53 +30,9 @@ public class ToReadBooksActivity extends Base {
         rvBooksToRead = findViewById(R.id.rvBooksToRead);
         pbSearch = findViewById(R.id.pbSearch);
 
-        FirebaseRecyclerOptions<Book> options =
-                new FirebaseRecyclerOptions.Builder<Book>()
-                        .setQuery(FirebaseDatabase.getInstance().getReference("booksToRead"), Book.class)
-                        .build();
-
-        adapter = new FirebaseRecyclerAdapter<Book, BookViewHolder>(options) {
-            @Override
-            protected void onBindViewHolder(@NonNull BookViewHolder holder, final int position, @NonNull Book book) {
-                book = getItem(position);
-                // Populate the data into the template view using the Book object
-                holder.tvTitle.setText(book.getTitle());
-                holder.tvAuthor.setText(book.getAuthor());
-
-                // Use custom Picasso instance to fetch book cover
-                PicassoTrustAll.getInstance(getApplicationContext())
-                        .load(Uri.parse(book.getImageLink()))
-                        .fit().centerInside().error(R.drawable.ic_nocover).into(holder.ivCover);
-
-                if (book.getDateAdded() != null) {
-                    holder.tvDateAdded.setText(book.getDateAdded());
-                }
-
-                holder.itemView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        // Launch the BookInfoActivity activity passing book as an extra
-                        Intent intent = new Intent(getApplicationContext(), BookInfoActivity.class);
-                        intent.putExtra("book_info_key", getItem(position));
-                        intent.putExtra("ToReadContext", "ToReadContext");
-                        startActivity(intent);
-                    }
-                });
-            }
-
-            @NonNull
-            @Override
-            public BookViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-                View view = LayoutInflater.from(parent.getContext())
-                        .inflate(R.layout.book_item, parent, false);
-
-                return new BookViewHolder(view);
-            }
-        };
-
+        // Display books in a RecyclerView
+        rvBooksToRead.setAdapter(new BookAdapter(getApplicationContext(), app.booksToRead));
         rvBooksToRead.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
-        adapter.startListening();
-        rvBooksToRead.setAdapter(adapter);
     }
 
     @Override
@@ -130,7 +75,7 @@ public class ToReadBooksActivity extends Base {
 
         switch (id) {
             case (R.id.action_home):
-                app.booksList.clear();
+                app.booksResults.clear();
                 startActivity(homeIntent);
                 break;
             case (R.id.action_clear):
@@ -143,29 +88,5 @@ public class ToReadBooksActivity extends Base {
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        if (adapter != null) {
-            adapter.startListening();
-        }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (adapter != null) {
-            adapter.startListening();
-        }
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        if (adapter != null) {
-            adapter.stopListening();
-        }
     }
 }

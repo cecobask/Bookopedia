@@ -123,7 +123,7 @@ public class BookInfoActivity extends Base {
             tvPageCount.setText(String.format(getResources().getString(R.string.page_count), book.getNumPages()));
             tvDescription.setText(book.getDescription());
             tvDateAdded.setText(String.format(getResources().getString(R.string.added_on), book.getDateAdded()));
-            if(!book.getNotes().equals("0")){
+            if (!book.getNotes().equals("0")) {
                 tvNotes.setText(book.getNotes());
             }
 
@@ -158,7 +158,7 @@ public class BookInfoActivity extends Base {
 
         switch (id) {
             case (R.id.action_home):
-                app.booksList.clear();
+                app.booksResults.clear();
                 Intent goHome = new Intent(getApplicationContext(), BookListActivity.class);
                 startActivity(goHome);
                 break;
@@ -174,7 +174,7 @@ public class BookInfoActivity extends Base {
                 app.booksToReadDb.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        if(!dataSnapshot.exists()){
+                        if (!dataSnapshot.exists()) {
                             finishAffinity();
                             startActivity(new Intent(getApplicationContext(), BookListActivity.class));
                         } else {
@@ -185,7 +185,7 @@ public class BookInfoActivity extends Base {
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError databaseError) {
-                        Log.e("Bookopedia", ""+databaseError);
+                        Log.e("Bookopedia", "" + databaseError);
                     }
                 });
 

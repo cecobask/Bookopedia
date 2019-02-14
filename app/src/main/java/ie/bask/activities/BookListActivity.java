@@ -1,17 +1,24 @@
 package ie.bask.activities;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 
+import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.firebase.database.FirebaseDatabase;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
 import org.json.JSONArray;
@@ -19,8 +26,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import cz.msebera.android.httpclient.Header;
+import ie.bask.PicassoTrustAll;
 import ie.bask.R;
-import ie.bask.adapters.BookAdapter;
+import ie.bask.adapters.BookViewHolder;
 import ie.bask.main.Base;
 import ie.bask.main.BookClient;
 import ie.bask.main.BookopediaApp;
@@ -32,7 +40,8 @@ public class BookListActivity extends Base {
     private Handler handler = new Handler();
     private Runnable runnable;
     private RecyclerView rvBooks;
-    private BookAdapter bookAdapter;
+    //    private BookAdapter bookAdapter;
+    private FirebaseRecyclerAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +55,52 @@ public class BookListActivity extends Base {
         rvBooks = findViewById(R.id.rvBooks);
         rvBooks.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
 
+        FirebaseRecyclerOptions<Book> options =
+                new FirebaseRecyclerOptions.Builder<Book>()
+                        .setQuery(FirebaseDatabase.getInstance().getReference("bookResults"), Book.class)
+                        .build();
+
+        adapter = new FirebaseRecyclerAdapter<Book, BookViewHolder>(options) {
+            @Override
+            protected void onBindViewHolder(@NonNull final BookViewHolder holder, int position, @NonNull Book book) {
+                book = getItem(holder.getAdapterPosition());
+                // Populate the data into the template view using the Book object
+                holder.tvTitle.setText(book.getTitle());
+                holder.tvAuthor.setText(book.getAuthor());
+
+                // Use custom Picasso instance to fetch book cover
+                PicassoTrustAll.getInstance(getApplicationContext())
+                        .load(Uri.parse(book.getImageLink()))
+                        .fit().centerInside().error(R.drawable.ic_nocover).into(holder.ivCover);
+
+                if (book.getDateAdded() != null) {
+                    holder.tvDateAdded.setText(book.getDateAdded());
+                }
+
+                holder.itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        // Launch the BookInfoActivity activity passing book as an extra
+                        Intent intent = new Intent(getApplicationContext(), BookInfoActivity.class);
+                        intent.putExtra("book_info_key", getItem(holder.getAdapterPosition()));
+                        startActivity(intent);
+                    }
+                });
+            }
+
+            @NonNull
+            @Override
+            public BookViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+                View view = LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.book_item, parent, false);
+
+                return new BookViewHolder(view);
+            }
+        };
+
+        rvBooks.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+        adapter.startListening();
+        rvBooks.setAdapter(adapter);
     }
 
     @Override
@@ -142,7 +197,7 @@ public class BookListActivity extends Base {
             case (R.id.action_home):
                 // Clear ListView and hide ProgressBar
                 BookListActivity.this.setTitle(R.string.app_name);
-                app.booksList.clear();
+                app.booksResults.clear();
                 pbSearch.setVisibility(View.GONE);
                 tvNoResults.setText(null);
                 break;
@@ -152,11 +207,6 @@ public class BookListActivity extends Base {
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
     }
 
     // Executes an API call to the Google Books search endpoint, parses the results
@@ -173,17 +223,25 @@ public class BookListActivity extends Base {
                     // Hide progress bar and TextView
                     pbSearch.setVisibility(View.GONE);
                     tvNoResults.setText(null);
-                    JSONArray items;
+
+                    // Clear stored results
+                    app.bookResultsDb.removeValue();
+
                     if (response.getInt("totalItems") != 0) {
                         // Get the items json array
-                        items = response.getJSONArray("items");
-                        // Parse json array into array of Book objects
-                        app.booksList = Book.fromJson(items);
-                        bookAdapter = new BookAdapter(getApplicationContext(), app.booksList);
-                        rvBooks.setAdapter(bookAdapter);
+                        JSONArray items = response.getJSONArray("items");
 
+                        // Parse json array into array of Book objects
+                        app.booksResults = Book.fromJson(items);
+
+                        // Store search results on Firebase
+                        for (Book bookResult : app.booksResults) {
+                            app.bookResultsDb.child(bookResult.getBookId()).setValue(bookResult);
+                        }
                     } else {
-                        app.booksList.clear();
+                        // Clear results
+                        app.booksResults.clear();
+                        app.bookResultsDb.removeValue();
                         tvNoResults.setText("No results found.\nSorry for the inconvenience.");
                     }
                 } catch (JSONException e) {
@@ -200,5 +258,29 @@ public class BookListActivity extends Base {
                 Log.d("JsonObject: ", "" + errorResponse);
             }
         });
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (adapter != null) {
+            adapter.startListening();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (adapter != null) {
+            adapter.startListening();
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (adapter != null) {
+            adapter.stopListening();
+        }
     }
 }
