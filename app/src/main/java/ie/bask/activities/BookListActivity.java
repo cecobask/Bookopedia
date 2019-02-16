@@ -40,8 +40,8 @@ public class BookListActivity extends Base {
     private Handler handler = new Handler();
     private Runnable runnable;
     private RecyclerView rvBooks;
-    //    private BookAdapter bookAdapter;
     private FirebaseRecyclerAdapter adapter;
+    private Menu menu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -186,6 +186,7 @@ public class BookListActivity extends Base {
             }
         });
 
+        this.menu = menu;
         return true;
     }
 
@@ -273,6 +274,12 @@ public class BookListActivity extends Base {
         super.onResume();
         if (adapter != null) {
             adapter.startListening();
+        }
+
+        // Show 'To Read' MenuItem if there are books in the list
+        if(!app.booksToRead.isEmpty()){
+            MenuItem toReadItem = menu.findItem(R.id.action_to_read);
+            toReadItem.setVisible(true);
         }
     }
 

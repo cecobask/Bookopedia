@@ -2,13 +2,21 @@ package ie.bask.adapters;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.view.ActionMode;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.davidecirillo.multichoicerecyclerview.MultiChoiceAdapter;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 
@@ -17,15 +25,20 @@ import ie.bask.R;
 import ie.bask.activities.BookInfoActivity;
 import ie.bask.models.Book;
 
-public class BookAdapter extends MultiChoiceAdapter<BookViewHolder> {
+public class BookAdapter extends RecyclerView.Adapter<BookViewHolder> {
 
     private ArrayList<Book> booksArray;
     private LayoutInflater mInflater;
+    private Context context;
+    private boolean multiSelect = false;
+    private ArrayList<Book> selectedItems = new ArrayList<>();
+    private DatabaseReference booksToReadDb;
 
     // data is passed into the constructor
     public BookAdapter(Context context, ArrayList<Book> booksArray) {
         this.mInflater = LayoutInflater.from(context);
         this.booksArray = booksArray;
+        this.context = context;
     }
 
 
@@ -38,9 +51,9 @@ public class BookAdapter extends MultiChoiceAdapter<BookViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(final BookViewHolder holder, final int position) {
-        super.onBindViewHolder(holder, position);
-        Book book = booksArray.get(position);
+    public void onBindViewHolder(@NonNull final BookViewHolder holder, final int position) {
+        final Book book = booksArray.get(holder.getAdapterPosition());
+        holder.itemView.setTag(book.getBookId());
         // Populate the data into the template view using the Book object
         holder.tvTitle.setText(book.getTitle());
         holder.tvAuthor.setText(book.getAuthor());
@@ -53,6 +66,74 @@ public class BookAdapter extends MultiChoiceAdapter<BookViewHolder> {
         if (book.getDateAdded() != null) {
             holder.tvDateAdded.setText(book.getDateAdded());
         }
+
+        // Deselect selection when Action bar closes
+        if(!multiSelect){
+            holder.itemView.setBackgroundColor(Color.TRANSPARENT);
+        }
+
+        // Long click listener for starting ActionMode
+        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                ((AppCompatActivity) context).startSupportActionMode(new ActionMode.Callback() {
+                    @Override
+                    public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
+                        multiSelect = true;
+                        MenuInflater inflater = actionMode.getMenuInflater();
+                        // Replace default menu
+                        inflater.inflate(R.menu.menu_multi, menu);
+                        booksToReadDb = FirebaseDatabase.getInstance().getReference("booksToRead");
+                        return true;
+                    }
+
+                    @Override
+                    public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
+                        for (Book book : selectedItems) {
+                            // Delete selected books
+                            booksArray.remove(book);
+                            booksToReadDb.child(book.getBookId()).removeValue();
+                            holder.itemView.setBackgroundColor(Color.TRANSPARENT);
+                            multiSelect = false;
+                        }
+                        notifyDataSetChanged();
+                        actionMode.finish();
+                        return true;
+                    }
+
+                    @Override
+                    public void onDestroyActionMode(ActionMode actionMode) {
+                        multiSelect = false;
+                        notifyDataSetChanged();
+                        selectedItems.clear();
+                    }
+                });
+                selectItem(book, holder.itemView);
+                return true;
+            }
+        });
+
+        // Click listener actions depending if multiSelect is active
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(multiSelect) {
+                    selectItem(book, holder.itemView);
+                } else {
+                    // Launch the BookInfoActivity activity passing book as an extra
+                    Intent intent = new Intent(context, BookInfoActivity.class);
+                    intent.putExtra("book_info_key", booksArray.get(position));
+                    intent.putExtra("ToReadContext", "ToReadContext");
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    holder.tvTitle.getContext().startActivity(intent);
+                }
+            }
+        });
     }
 
     @Override
@@ -60,21 +141,17 @@ public class BookAdapter extends MultiChoiceAdapter<BookViewHolder> {
         return booksArray.size();
     }
 
-    @Override
-    protected View.OnClickListener defaultItemViewClickListener(final BookViewHolder holder, final int position) {
-        return new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // Launch the BookInfoActivity activity passing book as an extra
-                Intent intent = new Intent(holder.tvTitle.getContext(), BookInfoActivity.class);
-                intent.putExtra("book_info_key", booksArray.get(position));
-                intent.putExtra("ToReadContext", "ToReadContext");
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                holder.tvTitle.getContext().startActivity(intent);
+    private void selectItem(Book book, View itemView) {
+        if (multiSelect) {
+            if (selectedItems.contains(book)) {
+                selectedItems.remove(book);
+                itemView.setBackgroundColor(Color.TRANSPARENT);
+            } else {
+                selectedItems.add(book);
+                itemView.setBackgroundColor(context.getColor(R.color.md_blue_200));
             }
-        };
-
-
+        }
     }
+
 
 }

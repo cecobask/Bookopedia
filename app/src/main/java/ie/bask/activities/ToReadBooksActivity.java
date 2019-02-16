@@ -11,28 +11,36 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+
 import ie.bask.R;
 import ie.bask.adapters.BookAdapter;
 import ie.bask.main.Base;
 import ie.bask.main.BookopediaApp;
+import ie.bask.models.Book;
 
 public class ToReadBooksActivity extends Base {
 
-    RecyclerView rvBooksToRead;
+    private RecyclerView rvBooksToRead;
+    private BookAdapter bookAdapter;
+    private ArrayList<Book> selectedBooks;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_to_read_books);
         app = (BookopediaApp) getApplication();
-        Toolbar toolbar = findViewById(R.id.toolbar);
+        final Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         rvBooksToRead = findViewById(R.id.rvBooksToRead);
         pbSearch = findViewById(R.id.pbSearch);
+        selectedBooks = new ArrayList<>();
 
         // Display books in a RecyclerView
-        rvBooksToRead.setAdapter(new BookAdapter(getApplicationContext(), app.booksToRead));
         rvBooksToRead.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+        bookAdapter = new BookAdapter(ToReadBooksActivity.this, app.booksToRead);
+
+        rvBooksToRead.setAdapter(bookAdapter);
     }
 
     @Override
@@ -88,5 +96,15 @@ public class ToReadBooksActivity extends Base {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(app.booksToRead.isEmpty()){
+            Intent goHome = new Intent(ToReadBooksActivity.this, BookListActivity.class);
+            startActivity(goHome);
+            finishAffinity();
+        }
     }
 }
