@@ -1,7 +1,9 @@
 package ie.bask.activities;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
@@ -11,19 +13,15 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-import java.util.ArrayList;
-
 import ie.bask.R;
 import ie.bask.adapters.BookAdapter;
+import ie.bask.adapters.BookFilter;
 import ie.bask.main.Base;
 import ie.bask.main.BookopediaApp;
-import ie.bask.models.Book;
 
 public class ToReadBooksActivity extends Base {
 
-    private RecyclerView rvBooksToRead;
-    private BookAdapter bookAdapter;
-    private ArrayList<Book> selectedBooks;
+    private BookFilter bookFilter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,13 +30,13 @@ public class ToReadBooksActivity extends Base {
         app = (BookopediaApp) getApplication();
         final Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        rvBooksToRead = findViewById(R.id.rvBooksToRead);
+        RecyclerView rvBooksToRead = findViewById(R.id.rvBooksToRead);
         pbSearch = findViewById(R.id.pbSearch);
-        selectedBooks = new ArrayList<>();
 
         // Display books in a RecyclerView
         rvBooksToRead.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
-        bookAdapter = new BookAdapter(ToReadBooksActivity.this, app.booksToRead);
+        BookAdapter bookAdapter = new BookAdapter(ToReadBooksActivity.this, app.booksToRead);
+        bookFilter = new BookFilter(app.booksToRead, bookAdapter);
 
         rvBooksToRead.setAdapter(bookAdapter);
     }
@@ -51,10 +49,25 @@ public class ToReadBooksActivity extends Base {
         final MenuItem toReadItem = menu.findItem(R.id.action_to_read);
         final MenuItem clearBooksItem = menu.findItem(R.id.action_clear);
         final MenuItem deleteBookItem = menu.findItem(R.id.action_delete);
+        final MenuItem logoutItem = menu.findItem(R.id.action_logout);
         toReadItem.setVisible(false);
         deleteBookItem.setVisible(false);
         final SearchView searchView = (SearchView) searchItem.getActionView();
         searchView.setMaxWidth(android.R.attr.width);
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                bookFilter.filter(query);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String query) {
+                bookFilter.filter(query);
+                return false;
+            }
+        });
 
         // Hide home button icon if SearchView is opened
         searchView.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
@@ -63,6 +76,7 @@ public class ToReadBooksActivity extends Base {
                 // search was detached/closed
                 homeItem.setVisible(true);
                 clearBooksItem.setVisible(true);
+                logoutItem.setVisible(true);
             }
 
             @Override
@@ -70,6 +84,7 @@ public class ToReadBooksActivity extends Base {
                 // search was opened
                 homeItem.setVisible(false);
                 clearBooksItem.setVisible(false);
+                logoutItem.setVisible(false);
             }
         });
 
@@ -79,7 +94,8 @@ public class ToReadBooksActivity extends Base {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        Intent homeIntent = new Intent(getApplicationContext(), BookListActivity.class);
+        final Intent homeIntent = new Intent(ToReadBooksActivity.this, BookListActivity.class);
+        AlertDialog alertDialog = new AlertDialog.Builder(ToReadBooksActivity.this).create();
 
         switch (id) {
             case (R.id.action_home):
@@ -87,11 +103,45 @@ public class ToReadBooksActivity extends Base {
                 startActivity(homeIntent);
                 break;
             case (R.id.action_clear):
-                app.booksToReadDb.removeValue();
-                app.booksToRead.clear();
-                Toast.makeText(this, "All books deleted", Toast.LENGTH_SHORT).show();
-                startActivity(homeIntent);
-                finishAffinity();
+                alertDialog.setMessage("Delete all books?");
+                alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "NO",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                dialogInterface.dismiss();
+                            }
+                        });
+                alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "YES",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                app.booksToReadDb.removeValue();
+                                app.booksToRead.clear();
+                                Toast.makeText(ToReadBooksActivity.this, "All books deleted", Toast.LENGTH_SHORT).show();
+                                startActivity(homeIntent);
+                                finishAffinity();
+                            }
+                        });
+                alertDialog.show();
+                break;
+            case (R.id.action_logout):
+                alertDialog.setMessage("You are about to log out. Proceed?");
+                alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "NO",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                dialogInterface.dismiss();
+                            }
+                        });
+                alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "YES",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                app.firebaseAuth.signOut();
+                                Intent loginIntent = new Intent(ToReadBooksActivity.this, LoginActivity.class);
+                                startActivity(loginIntent);
+                                finishAffinity();
+                            }
+                        });
+                alertDialog.show();
                 break;
         }
 

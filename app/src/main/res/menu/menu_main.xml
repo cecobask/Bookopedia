@@ -20,18 +20,22 @@
         android:id="@+id/action_to_read"
         android:icon="@drawable/ic_to_read"
         android:title="@string/books_to_read"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="always" />
 
     <item
         android:id="@+id/action_clear"
         android:icon="@drawable/ic_clear"
         android:title="@string/clear_books"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="always" />
 
     <item
         android:id="@+id/action_delete"
         android:icon="@drawable/ic_delete"
         android:title="@string/delete_book"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_logout"
+        android:title="@string/logout"/>
 
 </menu>

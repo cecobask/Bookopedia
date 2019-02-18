@@ -19,4 +19,48 @@
     <string name="notesLabel">Notes</string>
     <string name="tvNotes">No notes yet. Add notes by clicking on the Add notes button.</string>
     <string name="notes_dialog_message">Enter your notes here:</string>
+    <string name="user_login">User Login</string>
+    <string name="email_hint">Enter e-mail</string>
+    <string name="password_hint">Choose a password</string>
+    <string name="login_button">Login</string>
+    <string name="register_button">Sign me up!</string>
+    <string name="user_registration">User Registration</string>
+    <string name="username_hint">Create a username</string>
+    <string name="county_hint">Enter county</string>
+    <string name="logout">Log out</string>
+    <string name="login_pass_hint">Enter password</string>
+    <string name="book_added">Added to list</string>
+    <string-array name="counties">
+        <item>Antrim</item>
+        <item>Armagh</item>
+        <item>Cavan</item>
+        <item>Clare</item>
+        <item>Cork</item>
+        <item>Derry</item>
+        <item>Donegal</item>
+        <item>Down</item>
+        <item>Dublin</item>
+        <item>Fermanagh</item>
+        <item>Galway</item>
+        <item>Kerry</item>
+        <item>Kildare</item>
+        <item>Kilkenny</item>
+        <item>Laois</item>
+        <item>Leitrim</item>
+        <item>Limerick</item>
+        <item>Longford</item>
+        <item>Louth</item>
+        <item>Mayo</item>
+        <item>Meath</item>
+        <item>Monaghan</item>
+        <item>Offaly</item>
+        <item>Roscommon</item>
+        <item>Sligo</item>
+        <item>Tipperary</item>
+        <item>Tyrone</item>
+        <item>Waterford</item>
+        <item>Westmeath</item>
+        <item>Wexford</item>
+        <item>Wicklow</item>
+    </string-array>
 </resources>

@@ -4,11 +4,10 @@ import android.app.Application;
 import android.content.res.Configuration;
 import android.util.Log;
 
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
@@ -20,14 +19,18 @@ public class BookopediaApp extends Application {
     public ArrayList<Book> booksResults = new ArrayList<>();
     public DatabaseReference booksToReadDb;
     public DatabaseReference bookResultsDb;
-
+    public DatabaseReference usersDb;
+    public FirebaseAuth firebaseAuth;
+    private static BookopediaApp mInstance;
 
     // Called when the application is starting, before any other application objects have been created.
     @Override
     public void onCreate() {
         super.onCreate();
+        FirebaseApp.initializeApp(this);
+        mInstance = this;
+        usersDb = FirebaseDatabase.getInstance().getReference("users");
         Log.v("Bookopedia", "BookopediaApp started.");
-        loadBooks();
     }
 
     // Called by the system when the device configuration changes while your component is running.
@@ -43,31 +46,6 @@ public class BookopediaApp extends Application {
         super.onLowMemory();
     }
 
-    // Load Firebase database
-    public void loadBooks() {
-        // Getting the reference of booksToRead node
-        booksToReadDb = FirebaseDatabase.getInstance().getReference("booksToRead");
-        bookResultsDb = FirebaseDatabase.getInstance().getReference("bookResults");
-        // Attaching value event listener
-        booksToReadDb.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
+    public static BookopediaApp getInstance() { return mInstance; }
 
-                // Clearing the previous Books list
-                booksToRead.clear();
-
-                // Iterating through all the nodes
-                for (DataSnapshot bookSnapshot : dataSnapshot.getChildren()) {
-                    Book book = bookSnapshot.getValue(Book.class);
-                    // Adding Book to the list
-                    booksToRead.add(book);
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Log.e("Bookopedia", "" + databaseError);
-            }
-        });
-    }
 }

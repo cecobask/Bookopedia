@@ -1,10 +1,12 @@
 package ie.bask.adapters;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.RecyclerView;
@@ -15,24 +17,21 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-
 import java.util.ArrayList;
 
 import ie.bask.PicassoTrustAll;
 import ie.bask.R;
 import ie.bask.activities.BookInfoActivity;
+import ie.bask.main.BookopediaApp;
 import ie.bask.models.Book;
 
 public class BookAdapter extends RecyclerView.Adapter<BookViewHolder> {
 
-    private ArrayList<Book> booksArray;
+    ArrayList<Book> booksArray;
     private LayoutInflater mInflater;
     private Context context;
     private boolean multiSelect = false;
     private ArrayList<Book> selectedItems = new ArrayList<>();
-    private DatabaseReference booksToReadDb;
 
     // data is passed into the constructor
     public BookAdapter(Context context, ArrayList<Book> booksArray) {
@@ -83,7 +82,6 @@ public class BookAdapter extends RecyclerView.Adapter<BookViewHolder> {
                         MenuInflater inflater = actionMode.getMenuInflater();
                         // Replace default menu
                         inflater.inflate(R.menu.menu_multi, menu);
-                        booksToReadDb = FirebaseDatabase.getInstance().getReference("booksToRead");
                         return true;
                     }
 
@@ -93,16 +91,31 @@ public class BookAdapter extends RecyclerView.Adapter<BookViewHolder> {
                     }
 
                     @Override
-                    public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
-                        for (Book book : selectedItems) {
-                            // Delete selected books
-                            booksArray.remove(book);
-                            booksToReadDb.child(book.getBookId()).removeValue();
-                            holder.itemView.setBackgroundColor(Color.TRANSPARENT);
-                            multiSelect = false;
-                        }
-                        notifyDataSetChanged();
-                        actionMode.finish();
+                    public boolean onActionItemClicked(final ActionMode actionMode, MenuItem menuItem) {
+                        AlertDialog alertDialog = new AlertDialog.Builder(context).create();
+                        alertDialog.setMessage("Delete selected books?");
+                        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "NO",
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        dialogInterface.dismiss();
+                                    }
+                                });
+                        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "YES",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        for (Book book : selectedItems) {
+                                            // Delete selected books
+                                            booksArray.remove(book);
+                                            BookopediaApp.getInstance().booksToReadDb.child(book.getBookId()).removeValue();
+                                            holder.itemView.setBackgroundColor(Color.TRANSPARENT);
+                                            multiSelect = false;
+                                        }
+                                        notifyDataSetChanged();
+                                        actionMode.finish();
+                                    }
+                                });
+                        alertDialog.show();
                         return true;
                     }
 
@@ -127,7 +140,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookViewHolder> {
                 } else {
                     // Launch the BookInfoActivity activity passing book as an extra
                     Intent intent = new Intent(context, BookInfoActivity.class);
-                    intent.putExtra("book_info_key", booksArray.get(position));
+                    intent.putExtra("book_info_key", booksArray.get(holder.getAdapterPosition()));
                     intent.putExtra("ToReadContext", "ToReadContext");
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     holder.tvTitle.getContext().startActivity(intent);
