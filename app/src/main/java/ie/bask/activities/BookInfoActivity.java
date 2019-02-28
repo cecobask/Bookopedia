@@ -27,8 +27,8 @@ import com.google.firebase.database.ValueEventListener;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
-import ie.bask.PicassoTrustAll;
 import ie.bask.R;
+import ie.bask.adapters.PicassoTrustAll;
 import ie.bask.main.Base;
 import ie.bask.main.BookopediaApp;
 import ie.bask.models.Book;

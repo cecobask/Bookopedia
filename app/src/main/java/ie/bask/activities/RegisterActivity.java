@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.text.InputFilter;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -131,7 +130,6 @@ public class RegisterActivity extends Base implements View.OnClickListener {
 
                                 // Create new User object to store extra data about user
                                 User user = new User(id, email, username, password, county);
-                                Log.v("Bookopedia", user.toString());
 
                                 // Store in Firebase database
                                 app.usersDb.child(id).setValue(user);
