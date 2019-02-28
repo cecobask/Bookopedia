@@ -120,8 +120,11 @@ public class BookListActivity extends Base {
         };
 
         rvBooks.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
-        adapter.startListening();
         rvBooks.setAdapter(adapter);
+
+        if (adapter != null) {
+            adapter.startListening();
+        }
     }
 
     @Override

@@ -44,7 +44,7 @@
         android:layout_width="match_parent"
         android:layout_height="150dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="50dp"
         android:layout_marginEnd="8dp"
         android:contentDescription="slogan"
         android:src="@drawable/slogan"

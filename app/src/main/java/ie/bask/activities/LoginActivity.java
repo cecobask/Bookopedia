@@ -97,7 +97,7 @@ public class LoginActivity extends Base implements View.OnClickListener {
                             finish();
                             startActivity(new Intent(getApplicationContext(), BookListActivity.class));
                         } else {
-                            Toast.makeText(getApplicationContext(), "Login error", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplicationContext(), task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                         }
                     }
                 });

@@ -138,7 +138,7 @@ public class RegisterActivity extends Base implements View.OnClickListener {
                                 finish();
                                 startActivity(new Intent(RegisterActivity.this, BookListActivity.class));
                             } else {
-                                Toast.makeText(RegisterActivity.this, "Registration error", Toast.LENGTH_LONG).show();
+                                Toast.makeText(RegisterActivity.this, task.getException().getMessage(), Toast.LENGTH_LONG).show();
                             }
                             progressBar.setVisibility(View.GONE);
                         }
