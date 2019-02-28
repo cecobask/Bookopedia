@@ -10,6 +10,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -19,9 +20,9 @@ import android.view.ViewGroup;
 
 import java.util.ArrayList;
 
-import ie.bask.PicassoTrustAll;
 import ie.bask.R;
 import ie.bask.activities.BookInfoActivity;
+import ie.bask.activities.BookListActivity;
 import ie.bask.main.BookopediaApp;
 import ie.bask.models.Book;
 
@@ -113,6 +114,12 @@ public class BookAdapter extends RecyclerView.Adapter<BookViewHolder> {
                                         }
                                         notifyDataSetChanged();
                                         actionMode.finish();
+
+                                        if (booksArray.isEmpty()){
+                                            ((AppCompatActivity) context).finish();
+                                            Intent goHome = new Intent(context, BookListActivity.class);
+                                            context.startActivity(goHome);
+                                        }
                                     }
                                 });
                         alertDialog.show();

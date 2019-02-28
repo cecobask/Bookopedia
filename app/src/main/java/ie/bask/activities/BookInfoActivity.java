@@ -68,14 +68,6 @@ public class BookInfoActivity extends Base {
         hrView = findViewById(R.id.hrView2);
         tvNotesLabel = findViewById(R.id.tvNotesLabel);
         btnAddNotes = findViewById(R.id.btnAddNotes);
-
-        // Use the book to populate the data into our views
-        final Book book = (Book) getIntent().getSerializableExtra("book_info_key");
-        loadBook(book);
-
-        // Listen for clicks
-        setBookToReadListener(book);
-        setAddNoteListener(book);
     }
 
     // Populate data for the book
@@ -109,6 +101,8 @@ public class BookInfoActivity extends Base {
                     btnToRead.getBackground().setColorFilter(getColor(R.color.md_green_200), PorterDuff.Mode.MULTIPLY);
                     bookInList = true;
                 } else {
+                    btnToRead.setText(getString(R.string.to_read_button));
+                    btnToRead.getBackground().setColorFilter(Color.parseColor("#ffd6d7d7"), PorterDuff.Mode.MULTIPLY);
                     bookInList = false;
                 }
             }
@@ -352,5 +346,18 @@ public class BookInfoActivity extends Base {
                 alertDialog.show();
             }
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // Use the book to populate the data into our views
+        final Book book = (Book) getIntent().getSerializableExtra("book_info_key");
+        loadBook(book);
+
+        // Listen for clicks
+        setBookToReadListener(book);
+        setAddNoteListener(book);
     }
 }
