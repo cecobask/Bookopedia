@@ -1,5 +1,7 @@
 package ie.bask.models;
 
+import android.support.annotation.NonNull;
+
 public class User {
     private String id;
     private String email;
@@ -59,6 +61,7 @@ public class User {
         this.county = county;
     }
 
+    @NonNull
     @Override
     public String toString() {
         return "User{" +

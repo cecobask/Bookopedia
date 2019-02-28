@@ -17,11 +17,15 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
 import org.json.JSONArray;
@@ -29,9 +33,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import cz.msebera.android.httpclient.Header;
-import ie.bask.PicassoTrustAll;
 import ie.bask.R;
 import ie.bask.adapters.BookViewHolder;
+import ie.bask.adapters.PicassoTrustAll;
 import ie.bask.main.Base;
 import ie.bask.main.BookClient;
 import ie.bask.main.BookopediaApp;
@@ -43,6 +47,7 @@ public class BookListActivity extends Base {
     private Handler handler = new Handler();
     private Runnable runnable;
     private FirebaseRecyclerAdapter adapter;
+    private ImageView slogan;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +57,7 @@ public class BookListActivity extends Base {
         setSupportActionBar(toolbar);
         app = (BookopediaApp) getApplication();
         pbSearch = findViewById(R.id.pbSearch);
+        slogan = findViewById(R.id.slogan);
 
         // Initialising Firebase authentication object
         app.firebaseAuth = FirebaseAuth.getInstance();
@@ -214,8 +220,10 @@ public class BookListActivity extends Base {
                 // Clear ListView and hide ProgressBar
                 BookListActivity.this.setTitle(R.string.app_name);
                 app.booksResults.clear();
+                app.bookResultsDb.removeValue();
                 pbSearch.setVisibility(View.GONE);
-                tvNoResults.setText(null);
+                tvNoResults.setText(getString(R.string.welcome_message));
+                slogan.setVisibility(View.VISIBLE);
                 break;
             case (R.id.action_to_read):
                 Intent toReadIntent = new Intent(BookListActivity.this, ToReadBooksActivity.class);
@@ -260,6 +268,7 @@ public class BookListActivity extends Base {
                     // Hide progress bar and TextView
                     pbSearch.setVisibility(View.GONE);
                     tvNoResults.setText(null);
+                    slogan.setVisibility(View.GONE);
 
                     // Clear stored results
                     app.bookResultsDb.removeValue();
@@ -279,7 +288,8 @@ public class BookListActivity extends Base {
                         // Clear results
                         app.booksResults.clear();
                         app.bookResultsDb.removeValue();
-                        tvNoResults.setText("No results found.\nSorry for the inconvenience.");
+                        tvNoResults.setText(getString(R.string.no_results));
+                        slogan.setVisibility(View.GONE);
                     }
                 } catch (JSONException e) {
                     pbSearch.setVisibility(View.GONE);
@@ -304,6 +314,25 @@ public class BookListActivity extends Base {
             adapter.startListening();
         }
         invalidateOptionsMenu();
+
+        // Hide or show slogan and welcome message depending if search results is empty
+        app.bookResultsDb.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    tvNoResults.setText(null);
+                    slogan.setVisibility(View.GONE);
+                } else {
+                    tvNoResults.setText(getString(R.string.welcome_message));
+                    slogan.setVisibility(View.VISIBLE);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.e("Bookopedia", ""+databaseError);
+            }
+        });
     }
 
     @Override

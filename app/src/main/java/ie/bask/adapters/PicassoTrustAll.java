@@ -1,4 +1,4 @@
-package ie.bask;
+package ie.bask.adapters;
 
 import android.content.Context;
 import android.net.Uri;

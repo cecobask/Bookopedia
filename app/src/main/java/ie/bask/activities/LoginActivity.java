@@ -28,7 +28,6 @@ public class LoginActivity extends Base implements View.OnClickListener {
 
     // Widgets
     private Button buttonLogin;
-    private Button buttonRegister;
     private EditText editTextEmail;
     private EditText editTextPassword;
     private ProgressBar progressBar;
@@ -43,7 +42,7 @@ public class LoginActivity extends Base implements View.OnClickListener {
         editTextEmail = findViewById(R.id.editTextEmail);
         editTextPassword = findViewById(R.id.editTextPassword);
         buttonLogin = findViewById(R.id.buttonLogin);
-        buttonRegister = findViewById(R.id.buttonRegister);
+        Button buttonRegister = findViewById(R.id.buttonRegister);
         progressBar = findViewById(R.id.pbSearch);
 
         app.firebaseAuth = FirebaseAuth.getInstance();

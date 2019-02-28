@@ -99,7 +99,6 @@ public class ToReadBooksActivity extends Base {
 
         switch (id) {
             case (R.id.action_home):
-                app.booksResults.clear();
                 startActivity(homeIntent);
                 break;
             case (R.id.action_clear):

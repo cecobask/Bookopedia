@@ -170,7 +170,6 @@ public class BookInfoActivity extends Base {
 
         switch (id) {
             case (R.id.action_home):
-                app.booksResults.clear();
                 Intent goHome = new Intent(getApplicationContext(), BookListActivity.class);
                 startActivity(goHome);
                 break;

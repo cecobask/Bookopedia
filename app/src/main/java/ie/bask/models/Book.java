@@ -1,5 +1,6 @@
 package ie.bask.models;
 
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import org.json.JSONArray;
@@ -137,5 +138,21 @@ public class Book implements Serializable {
 
     public String getNotes() {
         return notes;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return "Book{" +
+                "bookId='" + bookId + '\'' +
+                ", author='" + author + '\'' +
+                ", title='" + title + '\'' +
+                ", imageLink='" + imageLink + '\'' +
+                ", description='" + description + '\'' +
+                ", publisher='" + publisher + '\'' +
+                ", numPages=" + numPages +
+                ", dateAdded='" + dateAdded + '\'' +
+                ", notes='" + notes + '\'' +
+                '}';
     }
 }
