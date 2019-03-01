@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.text.InputFilter;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -17,10 +18,14 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
 
 import ie.bask.R;
 import ie.bask.main.Base;
 import ie.bask.main.BookopediaApp;
+import ie.bask.models.Book;
 import ie.bask.models.User;
 
 public class RegisterActivity extends Base implements View.OnClickListener {
@@ -133,8 +138,7 @@ public class RegisterActivity extends Base implements View.OnClickListener {
 
                                 // Store in Firebase database
                                 app.usersDb.child(id).setValue(user);
-                                app.booksToReadDb = app.usersDb.child(task.getResult().getUser().getUid()).child("booksToRead");
-                                app.bookResultsDb = app.usersDb.child(task.getResult().getUser().getUid()).child("bookResults");
+                                loadBooks();
 
                                 // Close activity
                                 finish();
@@ -159,5 +163,32 @@ public class RegisterActivity extends Base implements View.OnClickListener {
             registerUser();
         }
 
+    }
+
+    // Load Firebase database
+    public void loadBooks() {
+        app.booksToReadDb = app.usersDb.child(app.firebaseAuth.getCurrentUser().getUid()).child("booksToRead");
+        app.bookResultsDb = app.usersDb.child(app.firebaseAuth.getCurrentUser().getUid()).child("bookResults");
+
+        // Attaching value event listener
+        app.booksToReadDb.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                // Clearing the previous Books list
+                app.booksToRead.clear();
+
+                // Iterating through all the nodes
+                for (DataSnapshot bookSnapshot : dataSnapshot.getChildren()) {
+                    Book book = bookSnapshot.getValue(Book.class);
+                    // Adding Book to the list
+                    app.booksToRead.add(book);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.e("Bookopedia", "" + databaseError);
+            }
+        });
     }
 }

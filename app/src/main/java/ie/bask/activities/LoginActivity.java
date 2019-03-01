@@ -91,8 +91,6 @@ public class LoginActivity extends Base implements View.OnClickListener {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         progressBar.setVisibility(View.GONE);
                         if (task.isSuccessful()) {
-                            app.booksToReadDb = app.usersDb.child(task.getResult().getUser().getUid()).child("booksToRead");
-                            app.bookResultsDb = app.usersDb.child(task.getResult().getUser().getUid()).child("bookResults");
                             loadBooks();
                             finish();
                             startActivity(new Intent(getApplicationContext(), BookListActivity.class));
