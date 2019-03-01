@@ -133,6 +133,8 @@ public class RegisterActivity extends Base implements View.OnClickListener {
 
                                 // Store in Firebase database
                                 app.usersDb.child(id).setValue(user);
+                                app.booksToReadDb = app.usersDb.child(task.getResult().getUser().getUid()).child("booksToRead");
+                                app.bookResultsDb = app.usersDb.child(task.getResult().getUser().getUid()).child("bookResults");
 
                                 // Close activity
                                 finish();

@@ -26,6 +26,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Iterator;
 
 import ie.bask.R;
 import ie.bask.adapters.PicassoTrustAll;
@@ -268,9 +269,15 @@ public class BookInfoActivity extends Base {
     }
 
     private void removeBookToRead(Book book) {
-        // Removing the book from Firebase Database
+        // Removing the book from Firebase Database and local ArrayList
+        for (Iterator<Book> iterator = app.booksToRead.iterator(); iterator.hasNext();){
+            Book value = iterator.next();
+            if (value.getBookId().equals(book.getBookId())) {
+                iterator.remove();
+            }
+        }
         app.booksToReadDb.child(book.getBookId()).removeValue();
-        app.booksToRead.remove(book);
+
         Toast.makeText(getApplicationContext(), "Book removed from TO READ list", Toast.LENGTH_SHORT).show();
     }
 
@@ -353,7 +360,7 @@ public class BookInfoActivity extends Base {
         super.onResume();
 
         // Use the book to populate the data into our views
-        final Book book = (Book) getIntent().getSerializableExtra("book_info_key");
+        Book book = (Book) getIntent().getSerializableExtra("book_info_key");
         loadBook(book);
 
         // Listen for clicks

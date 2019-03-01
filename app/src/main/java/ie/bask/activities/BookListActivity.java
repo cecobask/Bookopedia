@@ -121,10 +121,6 @@ public class BookListActivity extends Base {
 
         rvBooks.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
         rvBooks.setAdapter(adapter);
-
-        if (adapter != null) {
-            adapter.startListening();
-        }
     }
 
     @Override
@@ -313,16 +309,14 @@ public class BookListActivity extends Base {
     @Override
     protected void onResume() {
         super.onResume();
-        if (adapter != null) {
-            adapter.startListening();
-        }
-        invalidateOptionsMenu();
 
         // Hide or show slogan and welcome message depending if search results is empty
         app.bookResultsDb.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
+                    adapter.startListening();
+                    invalidateOptionsMenu();
                     tvNoResults.setText(null);
                     slogan.setVisibility(View.GONE);
                 } else {
