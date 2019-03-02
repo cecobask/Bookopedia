@@ -22,6 +22,7 @@ import ie.bask.main.BookopediaApp;
 public class ToReadBooksActivity extends Base {
 
     private BookFilter bookFilter;
+    private BookAdapter bookAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,7 +36,7 @@ public class ToReadBooksActivity extends Base {
 
         // Display books in a RecyclerView
         rvBooksToRead.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
-        BookAdapter bookAdapter = new BookAdapter(ToReadBooksActivity.this, app.booksToRead);
+        bookAdapter = new BookAdapter(ToReadBooksActivity.this, app.booksToRead);
         bookFilter = new BookFilter(app.booksToRead, bookAdapter);
 
         rvBooksToRead.setAdapter(bookAdapter);
@@ -155,5 +156,8 @@ public class ToReadBooksActivity extends Base {
             startActivity(goHome);
             finishAffinity();
         }
+
+        // Used when user deletes a book and returns to this activity
+        bookAdapter.notifyDataSetChanged();
     }
 }

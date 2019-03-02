@@ -73,7 +73,7 @@ public class BookInfoActivity extends Base {
 
     // Populate data for the book
     private void loadBook(Book book) {
-        if (book.getDateAdded() == null) {
+        if (!book.toReadStatus()) {
             //change activity title
             this.setTitle(book.getTitle());
             btnToRead.setVisibility(View.VISIBLE);
@@ -107,6 +107,7 @@ public class BookInfoActivity extends Base {
                     bookInList = false;
                 }
             }
+            invalidateOptionsMenu();
         } else {
             // Change activity title
             this.setTitle(book.getTitle());
@@ -133,7 +134,7 @@ public class BookInfoActivity extends Base {
             if (!book.getNotes().equals("0")) {
                 tvNotes.setText(book.getNotes());
             }
-
+            invalidateOptionsMenu();
         }
     }
 
@@ -146,7 +147,10 @@ public class BookInfoActivity extends Base {
         final MenuItem deleteBookItem = menu.findItem(R.id.action_delete);
 
         // Hide menu items
-        if (getIntent().getStringExtra("ToReadContext") == null) {
+        Book book = (Book) getIntent().getSerializableExtra("book_info_key");
+        if (book.toReadStatus()){
+            deleteBookItem.setVisible(true);
+        } else {
             deleteBookItem.setVisible(false);
         }
         searchItem.setVisible(false);
@@ -191,12 +195,12 @@ public class BookInfoActivity extends Base {
                                 app.booksToReadDb.addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                        // If the user deletes the last book in his list
                                         if (!dataSnapshot.exists()) {
                                             finishAffinity();
                                             startActivity(new Intent(getApplicationContext(), BookListActivity.class));
                                         } else {
-                                            finishAffinity();
-                                            startActivity(new Intent(getApplicationContext(), ToReadBooksActivity.class));
+                                            BookInfoActivity.this.finish();
                                         }
                                     }
 
@@ -243,7 +247,7 @@ public class BookInfoActivity extends Base {
                     // Use the book to populate the data into our views
                     String currentDate = ZonedDateTime.now().format(DateTimeFormatter.RFC_1123_DATE_TIME);
                     Book bookToRead = new Book(book.getBookId(), book.getAuthor(), book.getTitle(), book.getImageLink(),
-                            book.getDescription(), book.getPublisher(), book.getNumPages(), currentDate, "0");
+                            book.getDescription(), book.getPublisher(), book.getNumPages(), currentDate, "0", true);
                     addBookToRead(bookToRead);
                     invalidateOptionsMenu();
 

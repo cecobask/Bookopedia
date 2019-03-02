@@ -1,6 +1,5 @@
 package ie.bask.models;
 
-import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import org.json.JSONArray;
@@ -20,12 +19,13 @@ public class Book implements Serializable {
     private int numPages;
     private String dateAdded;
     private String notes;
+    public boolean toRead;
 
     public Book() {
     }
 
     public Book(String bookId, String author, String title, String imageLink, String description,
-                String publisher, int numPages, String dateAdded, String notes) {
+                String publisher, int numPages, String dateAdded, String notes, boolean toRead) {
         this.bookId = bookId;
         this.author = author;
         this.title = title;
@@ -35,6 +35,7 @@ public class Book implements Serializable {
         this.numPages = numPages;
         this.dateAdded = dateAdded;
         this.notes = notes;
+        this.toRead = toRead;
     }
 
     private Book(String bookId, String author, String title, String imageLink, String description, String publisher, int numPages) {
@@ -140,7 +141,8 @@ public class Book implements Serializable {
         return notes;
     }
 
-    @NonNull
+    public boolean toReadStatus() { return toRead; }
+
     @Override
     public String toString() {
         return "Book{" +
@@ -153,6 +155,7 @@ public class Book implements Serializable {
                 ", numPages=" + numPages +
                 ", dateAdded='" + dateAdded + '\'' +
                 ", notes='" + notes + '\'' +
+                ", toRead=" + toRead +
                 '}';
     }
 }

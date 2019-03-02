@@ -103,7 +103,20 @@ public class BookListActivity extends Base {
                     public void onClick(View view) {
                         // Launch the BookInfoActivity activity passing book as an extra
                         Intent intent = new Intent(getApplicationContext(), BookInfoActivity.class);
-                        intent.putExtra("book_info_key", getItem(holder.getAdapterPosition()));
+                        String clickedID = getItem(holder.getAdapterPosition()).getBookId();
+                        boolean no_match = true;
+                        // Loop through books in list
+                        for(Book elem: app.booksToRead){
+                            if(elem.getBookId().equals(clickedID)){
+                                intent.putExtra("book_info_key", elem);
+                                no_match = false;
+                                break;
+                            }
+                        }
+                        // Mean book is not in the list
+                        if(no_match){
+                            intent.putExtra("book_info_key", getItem(holder.getAdapterPosition()));
+                        }
                         startActivity(intent);
                     }
                 });
