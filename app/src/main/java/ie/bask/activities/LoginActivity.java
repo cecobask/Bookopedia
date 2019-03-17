@@ -120,7 +120,7 @@ public class LoginActivity extends Base implements View.OnClickListener {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         progressBar.setVisibility(View.GONE);
                         if (task.isSuccessful()) {
-                            loadBooks(currentUser.getUid());
+                            loadBooks(task.getResult().getUser().getUid());
                             finish();
                             startActivity(new Intent(getApplicationContext(), BookListActivity.class));
                         } else {
