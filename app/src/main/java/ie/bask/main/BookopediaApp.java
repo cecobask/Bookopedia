@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.res.Configuration;
 import android.util.Log;
 
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
@@ -21,6 +22,7 @@ public class BookopediaApp extends Application {
     public DatabaseReference bookResultsDb;
     public DatabaseReference usersDb;
     public FirebaseAuth firebaseAuth;
+    public GoogleSignInClient mGoogleSignInClient;
     private static BookopediaApp mInstance;
 
     // Called when the application is starting, before any other application objects have been created.

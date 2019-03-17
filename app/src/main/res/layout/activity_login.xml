@@ -53,6 +53,17 @@
             android:textColor="@color/md_white_1000" />
 
         <Button
+            android:id="@+id/buttonGoogleLogin"
+            style="@android:style/Widget.Material.Light.Button.Inset"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="15dp"
+            android:background="@drawable/roundcorners"
+            android:backgroundTint="#cd6ea916"
+            android:text="@string/google_sign_in"
+            android:textColor="@color/md_white_1000" />
+
+        <Button
             android:id="@+id/buttonRegister"
             style="@android:style/Widget.Material.Light.Button.Inset"
             android:layout_width="200dp"

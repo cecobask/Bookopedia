@@ -32,6 +32,7 @@
     <string name="book_added">Added to list</string>
     <string name="welcome_message">Welcome to Bookopedia!\n\nMake a book query by using the search icon above :)</string>
     <string name="no_results">No results found.\nSorry for the inconvenience.</string>
+    <string name="google_sign_in">Google Sign-in</string>
     <string-array name="counties">
         <item>Antrim</item>
         <item>Armagh</item>

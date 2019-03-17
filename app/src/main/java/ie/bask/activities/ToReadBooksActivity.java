@@ -1,9 +1,7 @@
 package ie.bask.activities;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
@@ -11,7 +9,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
 import ie.bask.R;
 import ie.bask.adapters.BookAdapter;
@@ -96,52 +93,16 @@ public class ToReadBooksActivity extends Base {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         final Intent homeIntent = new Intent(ToReadBooksActivity.this, BookListActivity.class);
-        AlertDialog alertDialog = new AlertDialog.Builder(ToReadBooksActivity.this).create();
 
         switch (id) {
             case (R.id.action_home):
                 startActivity(homeIntent);
                 break;
             case (R.id.action_clear):
-                alertDialog.setMessage("Delete all books?");
-                alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "NO",
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                dialogInterface.dismiss();
-                            }
-                        });
-                alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "YES",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                app.booksToReadDb.removeValue();
-                                app.booksToRead.clear();
-                                Toast.makeText(ToReadBooksActivity.this, "All books deleted", Toast.LENGTH_SHORT).show();
-                                startActivity(homeIntent);
-                                finishAffinity();
-                            }
-                        });
-                alertDialog.show();
+                showDialog(ToReadBooksActivity.this, "Delete all books?", "deleteAllBooks");
                 break;
             case (R.id.action_logout):
-                alertDialog.setMessage("You are about to log out. Proceed?");
-                alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "NO",
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                dialogInterface.dismiss();
-                            }
-                        });
-                alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "YES",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                app.firebaseAuth.signOut();
-                                Intent loginIntent = new Intent(ToReadBooksActivity.this, LoginActivity.class);
-                                startActivity(loginIntent);
-                                finishAffinity();
-                            }
-                        });
-                alertDialog.show();
+                showDialog(ToReadBooksActivity.this, "You are about to log out. Proceed?", "signOut");
                 break;
         }
 

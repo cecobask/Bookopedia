@@ -6,10 +6,8 @@ import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -19,10 +17,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.ValueEventListener;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -165,7 +159,6 @@ public class BookInfoActivity extends Base {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        AlertDialog alertDialog = new AlertDialog.Builder(BookInfoActivity.this).create();
 
         switch (id) {
             case (R.id.action_home):
@@ -177,62 +170,10 @@ public class BookInfoActivity extends Base {
                 startActivity(toReadIntent);
                 break;
             case (R.id.action_delete):
-                alertDialog.setMessage("Delete book?");
-                alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "NO",
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                dialogInterface.dismiss();
-                            }
-                        });
-                alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "YES",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                // Remove book from Firebase Database and local ArrayList
-                                Book book = (Book) getIntent().getSerializableExtra("book_info_key");
-                                app.booksToRead.remove(book);
-                                app.booksToReadDb.child(book.getBookId()).removeValue();
-                                app.booksToReadDb.addListenerForSingleValueEvent(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                        // If the user deletes the last book in his list
-                                        if (!dataSnapshot.exists()) {
-                                            finishAffinity();
-                                            startActivity(new Intent(getApplicationContext(), BookListActivity.class));
-                                        } else {
-                                            BookInfoActivity.this.finish();
-                                        }
-                                    }
-
-                                    @Override
-                                    public void onCancelled(@NonNull DatabaseError databaseError) {
-                                        Log.e("Bookopedia", "" + databaseError);
-                                    }
-                                });
-                            }
-                        });
-                alertDialog.show();
+                showDialog(BookInfoActivity.this, "Delete book?", "deleteBook");
                 break;
             case (R.id.action_logout):
-                alertDialog.setMessage("You are about to log out. Proceed?");
-                alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "NO",
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                dialogInterface.dismiss();
-                            }
-                        });
-                alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "YES",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                app.firebaseAuth.signOut();
-                                // Close activities and send the user to Login screen
-                                Intent loginIntent = new Intent(BookInfoActivity.this, LoginActivity.class);
-                                startActivity(loginIntent);
-                                finishAffinity();
-                            }
-                        });
-                alertDialog.show();
+                showDialog(BookInfoActivity.this, "You are about to log out. Proceed?", "signOut");
                 break;
         }
 

@@ -1,12 +1,10 @@
 package ie.bask.activities;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
@@ -225,7 +223,7 @@ public class BookListActivity extends Base {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        AlertDialog alertDialog = new AlertDialog.Builder(BookListActivity.this).create();
+
 
         switch (id) {
             case (R.id.action_home):
@@ -242,24 +240,7 @@ public class BookListActivity extends Base {
                 startActivity(toReadIntent);
                 break;
             case (R.id.action_logout):
-                alertDialog.setMessage("You are about to log out. Proceed?");
-                alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "NO",
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                dialogInterface.dismiss();
-                            }
-                        });
-                alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "YES",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                app.firebaseAuth.signOut();
-                                Intent loginIntent = new Intent(BookListActivity.this, LoginActivity.class);
-                                startActivity(loginIntent);
-                                finishAffinity();
-                            }
-                        });
-                alertDialog.show();
+                showDialog(BookListActivity.this, "You are about to log out. Proceed?", "signOut");
                 break;
         }
 
