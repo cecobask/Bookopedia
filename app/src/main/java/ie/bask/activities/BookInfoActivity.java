@@ -4,10 +4,12 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -18,8 +20,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.jetbrains.annotations.NotNull;
+
+import java.lang.reflect.Array;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 
 import ie.bask.R;
@@ -27,6 +34,8 @@ import ie.bask.adapters.PicassoTrustAll;
 import ie.bask.main.Base;
 import ie.bask.main.BookopediaApp;
 import ie.bask.models.Book;
+import ie.bask.models.Coordinates;
+import mumayank.com.airlocationlibrary.AirLocation;
 
 
 public class BookInfoActivity extends Base {
@@ -185,16 +194,30 @@ public class BookInfoActivity extends Base {
             @Override
             public void onClick(View view) {
                 if(!bookInList) {
-                    // Use the book to populate the data into our views
-                    String currentDate = ZonedDateTime.now().format(DateTimeFormatter.RFC_1123_DATE_TIME);
-                    Book bookToRead = new Book(book.getBookId(), book.getAuthor(), book.getTitle(), book.getImageLink(),
-                            book.getDescription(), book.getPublisher(), book.getNumPages(), currentDate, "0", true);
-                    addBookToRead(bookToRead);
-                    invalidateOptionsMenu();
+                    // Fetch location
+                    AirLocation location = new AirLocation(BookInfoActivity.this, true, true, new AirLocation.Callbacks() {
+                        @Override
+                        public void onSuccess(@NotNull Location location) {
+                            // Store latitude and longitude
+                            Coordinates coordinates = new Coordinates(location.getLatitude(), location.getLongitude());
+                            // Get current date and time
+                            String currentDate = ZonedDateTime.now().format(DateTimeFormatter.RFC_1123_DATE_TIME);
+                            // Create a book object
+                            Book bookToRead = new Book(book.getBookId(), book.getAuthor(), book.getTitle(), book.getImageLink(),
+                                    book.getDescription(), book.getPublisher(), book.getNumPages(), currentDate, "0", true, coordinates);
+                            addBookToRead(bookToRead);
+                            invalidateOptionsMenu();
 
-                    bookInList = true;
-                    btnToRead.setText(getString(R.string.book_added));
-                    btnToRead.getBackground().setColorFilter(getColor(R.color.md_green_200), PorterDuff.Mode.MULTIPLY);
+                            bookInList = true;
+                            btnToRead.setText(getString(R.string.book_added));
+                            btnToRead.getBackground().setColorFilter(getColor(R.color.md_green_200), PorterDuff.Mode.MULTIPLY);
+                        }
+
+                        @Override
+                        public void onFailed(@NotNull AirLocation.LocationFailedEnum locationFailedEnum) {
+                            Log.v("Bookopedia", locationFailedEnum.toString());
+                        }
+                    });
                 } else {
                     removeBookToRead(book);
                     invalidateOptionsMenu();

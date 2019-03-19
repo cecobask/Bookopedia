@@ -1,5 +1,7 @@
 package ie.bask.models;
 
+import android.location.Location;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import org.json.JSONArray;
@@ -10,6 +12,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 public class Book implements Serializable {
+    public boolean toRead;
     private String bookId;
     private String author;
     private String title;
@@ -19,13 +22,13 @@ public class Book implements Serializable {
     private int numPages;
     private String dateAdded;
     private String notes;
-    public boolean toRead;
+    private Coordinates coordinates;
 
     public Book() {
     }
 
     public Book(String bookId, String author, String title, String imageLink, String description,
-                String publisher, int numPages, String dateAdded, String notes, boolean toRead) {
+                String publisher, int numPages, String dateAdded, String notes, boolean toRead, Coordinates coordinates) {
         this.bookId = bookId;
         this.author = author;
         this.title = title;
@@ -36,6 +39,7 @@ public class Book implements Serializable {
         this.dateAdded = dateAdded;
         this.notes = notes;
         this.toRead = toRead;
+        this.coordinates = coordinates;
     }
 
     private Book(String bookId, String author, String title, String imageLink, String description, String publisher, int numPages) {
@@ -143,6 +147,9 @@ public class Book implements Serializable {
 
     public boolean toReadStatus() { return toRead; }
 
+    public Coordinates getCoordinates() { return coordinates; }
+
+    @NonNull
     @Override
     public String toString() {
         return "Book{" +
@@ -156,6 +163,7 @@ public class Book implements Serializable {
                 ", dateAdded='" + dateAdded + '\'' +
                 ", notes='" + notes + '\'' +
                 ", toRead=" + toRead +
+                ", coordinates=" + coordinates +
                 '}';
     }
 }

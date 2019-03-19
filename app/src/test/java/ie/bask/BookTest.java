@@ -6,6 +6,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import ie.bask.models.Book;
+import ie.bask.models.Coordinates;
 
 public class BookTest {
 
@@ -19,7 +20,7 @@ public class BookTest {
     private static final String EXPECTED_DATE_ADDED = null;
     private static final String EXPECTED_NOTES = null;
     private static final boolean EXPECTED_TO_READ = false;
-    private static final String EXPECTED_TO_STRING = "Book{bookId='4KwCoQEACAAJ', author='J. R. R. Tolkien', title='The Fellowship of the Ring', imageLink='http://books.google.com/books/content?id=4KwCoQEACAAJ&printsec=frontcover&img=1&zoom=5&source=gbs_api', description='Large print hardback edition of the first volume of J.R.R. Tolkien's epic adventure, The Lord of the Rings, complete with fold-out map. Sauron, the Dark Lord, has gathered to him all the Rings of Power -- the means by which he intends to rule Middle-earth. All he lacks in his plans for dominion is the One Ring -- the ring that rules them all -- which has fallen into the hands of the hobbit, Bilbo Baggins. In a sleepy village in the Shire, young Frodo Baggins finds himself faced with an immense task, as his elderly cousin Bilbo entrusts the Ring to his care. Frodo must leave his home and make a perilous journey across Middle-earth to the Cracks of Doom, there to destroy the Ring and foil the Dark Lord in his evil purpose. Now available in large print and impossible to describe in a few words, JRR Tolkien's great work of imaginative fiction has been labelled both a heroic romance and a classic fantasy fiction. By turns comic and homely, epic and diabolic, the narrative moves through countless changes of scene and character in an imaginary world which is totally convincing in its detail.', publisher='HarperCollins', numPages=560, dateAdded='null', notes='null', toRead=false}";
+    private static final String EXPECTED_TO_STRING = "Book{bookId='4KwCoQEACAAJ', author='J. R. R. Tolkien', title='The Fellowship of the Ring', imageLink='http://books.google.com/books/content?id=4KwCoQEACAAJ&printsec=frontcover&img=1&zoom=5&source=gbs_api', description='Large print hardback edition of the first volume of J.R.R. Tolkien's epic adventure, The Lord of the Rings, complete with fold-out map. Sauron, the Dark Lord, has gathered to him all the Rings of Power -- the means by which he intends to rule Middle-earth. All he lacks in his plans for dominion is the One Ring -- the ring that rules them all -- which has fallen into the hands of the hobbit, Bilbo Baggins. In a sleepy village in the Shire, young Frodo Baggins finds himself faced with an immense task, as his elderly cousin Bilbo entrusts the Ring to his care. Frodo must leave his home and make a perilous journey across Middle-earth to the Cracks of Doom, there to destroy the Ring and foil the Dark Lord in his evil purpose. Now available in large print and impossible to describe in a few words, JRR Tolkien's great work of imaginative fiction has been labelled both a heroic romance and a classic fantasy fiction. By turns comic and homely, epic and diabolic, the narrative moves through countless changes of scene and character in an imaginary world which is totally convincing in its detail.', publisher='HarperCollins', numPages=560, dateAdded='null', notes='null', toRead=false, coordinates=Coordinates{latitude=37.4220347, longitude=-122.0840085}}";
     private Book book;
 
     @Before
@@ -33,7 +34,8 @@ public class BookTest {
                 560,
                 null,
                 null,
-                false);
+                false,
+                new Coordinates(37.4220347,-122.0840085));
     }
 
     @After

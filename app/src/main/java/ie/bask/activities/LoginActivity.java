@@ -41,7 +41,6 @@ public class LoginActivity extends Base implements View.OnClickListener {
     private EditText editTextEmail;
     private EditText editTextPassword;
     private ProgressBar progressBar;
-    private FirebaseUser currentUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,12 +66,8 @@ public class LoginActivity extends Base implements View.OnClickListener {
         // Build a GoogleSignInClient with the options specified by gso.
         app.mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
-//        // Check for existing Google Sign In account, if the user is already signed in
-//        // the GoogleSignInAccount will be non-null.
-//        GoogleSignInAccount googleUser = GoogleSignIn.getLastSignedInAccount(this);
-
         app.firebaseAuth = FirebaseAuth.getInstance();
-        currentUser = app.firebaseAuth.getCurrentUser();
+        FirebaseUser currentUser = app.firebaseAuth.getCurrentUser();
 
         // Check if user is logged in
         if (currentUser != null) {
@@ -200,6 +195,9 @@ public class LoginActivity extends Base implements View.OnClickListener {
     private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
         Log.v("Bookopedia", "firebaseAuthWithGoogle:" + acct.getId());
 
+        // Display progress bar
+        progressBar.setVisibility(View.VISIBLE);
+
         AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
         app.firebaseAuth.signInWithCredential(credential)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
@@ -210,6 +208,7 @@ public class LoginActivity extends Base implements View.OnClickListener {
                             Log.v("Bookopedia", "signInWithCredential:success");
                             FirebaseUser user = app.firebaseAuth.getCurrentUser();
                             loadBooks(user.getUid());
+                            progressBar.setVisibility(View.GONE);
                             finish();
                             startActivity(new Intent(LoginActivity.this, BookListActivity.class));
                         } else {
