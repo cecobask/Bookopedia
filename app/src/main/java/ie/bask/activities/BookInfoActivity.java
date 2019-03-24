@@ -7,6 +7,7 @@ import android.graphics.PorterDuff;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -16,21 +17,20 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.lang.reflect.Array;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 
 import ie.bask.R;
 import ie.bask.adapters.PicassoTrustAll;
+import ie.bask.fragments.MapsFragment;
 import ie.bask.main.Base;
 import ie.bask.main.BookopediaApp;
 import ie.bask.models.Book;
@@ -52,6 +52,7 @@ public class BookInfoActivity extends Base {
     private TextView tvNotesLabel;
     private Button btnAddNotes;
     private boolean bookInList;
+    private FrameLayout mapFrame;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,6 +73,7 @@ public class BookInfoActivity extends Base {
         hrView = findViewById(R.id.hrView2);
         tvNotesLabel = findViewById(R.id.tvNotesLabel);
         btnAddNotes = findViewById(R.id.btnAddNotes);
+        mapFrame = findViewById(R.id.mapFrame);
     }
 
     // Populate data for the book
@@ -111,6 +113,9 @@ public class BookInfoActivity extends Base {
                 }
             }
             invalidateOptionsMenu();
+
+            // Hide map layout
+            mapFrame.setVisibility(View.GONE);
         } else {
             // Change activity title
             this.setTitle(book.getTitle());
@@ -138,6 +143,11 @@ public class BookInfoActivity extends Base {
                 tvNotes.setText(book.getNotes());
             }
             invalidateOptionsMenu();
+
+            // Show map with book location
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.replace(R.id.map, MapsFragment.newInstance(book));
+            ft.commit();
         }
     }
 

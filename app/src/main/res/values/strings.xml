@@ -33,6 +33,8 @@
     <string name="welcome_message">Welcome to Bookopedia!\n\nMake a book query by using the search icon above :)</string>
     <string name="no_results">No results found.\nSorry for the inconvenience.</string>
     <string name="google_sign_in">Google Sign-in</string>
+    <string name="title_map">Book Map</string>
+    <string name="google_maps_key">AIzaSyAlBLpqbGKcEEsCH8rU_xhq-hze7vzGcFg</string>
     <string-array name="counties">
         <item>Antrim</item>
         <item>Armagh</item>
@@ -66,4 +68,8 @@
         <item>Wexford</item>
         <item>Wicklow</item>
     </string-array>
+    <string name="title_activity_maps">Map</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
