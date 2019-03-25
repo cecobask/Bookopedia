@@ -30,7 +30,7 @@
     <string name="logout">Log out</string>
     <string name="login_pass_hint">Enter password</string>
     <string name="book_added">Added to list</string>
-    <string name="welcome_message">Welcome to Bookopedia!\n\nMake a book query by using the search icon above :)</string>
+    <string name="welcome_message">Welcome to Bookopedia!\n\nMake a book query by using\nthe search icon above :)\n\n\nTRY THE BARCODE SCANNER!</string>
     <string name="no_results">No results found.\nSorry for the inconvenience.</string>
     <string name="google_sign_in">Google Sign-in</string>
     <string name="title_map">Book Map</string>

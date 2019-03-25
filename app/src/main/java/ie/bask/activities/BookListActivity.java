@@ -1,10 +1,16 @@
 package ie.bask.activities;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
@@ -30,6 +36,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import cz.msebera.android.httpclient.Header;
 import ie.bask.R;
 import ie.bask.adapters.BookViewHolder;
@@ -46,6 +55,8 @@ public class BookListActivity extends Base {
     private Runnable runnable;
     private FirebaseRecyclerAdapter adapter;
     private ImageView slogan;
+    private FloatingActionButton fab;
+    private List<String> mPermDeniedList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +67,7 @@ public class BookListActivity extends Base {
         app = (BookopediaApp) getApplication();
         pbSearch = findViewById(R.id.pbSearch);
         slogan = findViewById(R.id.slogan);
+        fab = findViewById(R.id.fab_scan);
 
         // Initialising Firebase authentication object
         app.firebaseAuth = FirebaseAuth.getInstance();
@@ -132,6 +144,26 @@ public class BookListActivity extends Base {
 
         rvBooks.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
         rvBooks.setAdapter(adapter);
+
+        // Set listener for barcode scanner button
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Check if the user has provided permissions
+                if (isPermGranted(Manifest.permission.READ_EXTERNAL_STORAGE) &&
+                        isPermGranted(Manifest.permission.WRITE_EXTERNAL_STORAGE) &&
+                        isPermGranted(Manifest.permission.CAMERA)) {
+                    Intent scanIntent = new Intent(view.getContext(), BookScannerActivity.class);
+                    // Open barcode scanner activity
+                    startActivityForResult(scanIntent, 1000);
+                } else {
+                    // Add permission to List
+                    mPermDeniedList.add(Manifest.permission.READ_EXTERNAL_STORAGE);
+                    // Request user permission for READ_EXTERNAL_STORAGE
+                    requestPermissions(mPermDeniedList);
+                }
+            }
+        });
     }
 
     @Override
@@ -234,6 +266,7 @@ public class BookListActivity extends Base {
                 pbSearch.setVisibility(View.GONE);
                 tvNoResults.setText(getString(R.string.welcome_message));
                 slogan.setVisibility(View.VISIBLE);
+                fab.setVisibility(View.VISIBLE);
                 break;
             case (R.id.action_to_read):
                 Intent toReadIntent = new Intent(BookListActivity.this, ToReadBooksActivity.class);
@@ -262,6 +295,7 @@ public class BookListActivity extends Base {
                     pbSearch.setVisibility(View.GONE);
                     tvNoResults.setText(null);
                     slogan.setVisibility(View.GONE);
+                    fab.setVisibility(View.GONE);
 
                     // Clear stored results
                     app.bookResultsDb.removeValue();
@@ -313,9 +347,11 @@ public class BookListActivity extends Base {
                     invalidateOptionsMenu();
                     tvNoResults.setText(null);
                     slogan.setVisibility(View.GONE);
+                    fab.setVisibility(View.GONE);
                 } else {
                     tvNoResults.setText(getString(R.string.welcome_message));
                     slogan.setVisibility(View.VISIBLE);
+                    fab.setVisibility(View.VISIBLE);
                 }
             }
 
@@ -333,4 +369,40 @@ public class BookListActivity extends Base {
             adapter.stopListening();
         }
     }
+
+    private void requestPermissions(List<String> access) {
+        // Convert List to Array for use in requesting permissions
+        String[] stringArray = access.toArray(new String[access.size()]);
+        ActivityCompat.requestPermissions(this, stringArray, 1002);
+    }
+
+    // Method to check if a permission is granted
+    private boolean isPermGranted(String perm) {
+        return Build.VERSION.SDK_INT < Build.VERSION_CODES.M || ContextCompat.checkSelfPermission(BookListActivity.this, perm) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    // Handle permission request result
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 1002) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Open barcode scanner activity if permission was granted
+                Intent scanIntent = new Intent(this, BookScannerActivity.class);
+                startActivityForResult(scanIntent, 1000);
+            }
+        }
+    }
+
+    // Handle results from barcode scanner activity
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1000 && resultCode == 1000) {
+            // Search for books using the query from result
+            getBooks(data.getStringExtra("bar_code"));
+        }
+    }
+
+
 }

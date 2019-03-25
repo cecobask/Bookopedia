@@ -42,6 +42,7 @@ dependencies {
     implementation 'com.google.android.gms:play-services-location:16.0.0'
     implementation 'com.github.mumayank:AirLocation:1.2'
     implementation 'com.google.android.gms:play-services-maps:16.1.0'
+    implementation 'me.dm7.barcodescanner:zxing:1.9.8'
 }
 
 apply plugin: 'com.google.gms.google-services'
