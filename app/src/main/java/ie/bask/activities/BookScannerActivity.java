@@ -1,29 +1,18 @@
 package ie.bask.activities;
 
-
-
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-
 import com.google.zxing.Result;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import me.dm7.barcodescanner.zxing.ZXingScannerView;
-
-/**
- * Created by margarita on 11/28/18.
- */
-
 
 public class BookScannerActivity extends AppCompatActivity implements ZXingScannerView.ResultHandler {
     private ZXingScannerView mScannerView;
@@ -32,30 +21,38 @@ public class BookScannerActivity extends AppCompatActivity implements ZXingScann
     @Override
     public void onCreate(Bundle state) {
         super.onCreate(state);
-        //check permission to camera
-        if (isPermGranted(Manifest.permission.CAMERA)) {
-            mScannerView = new ZXingScannerView(this);   // Programmatically initialize the scanner view
-            setContentView(mScannerView);                // Set the scanner view as the content view
+        // Check permission to camera
+        if (isPermGranted()) {
+            // Initialize the scanner view
+            mScannerView = new ZXingScannerView(this);
+            setContentView(mScannerView);
         } else {
             mPermDeniedList.add(Manifest.permission.CAMERA);
-            checkPermission(mPermDeniedList, 1001);
+            // Request camera permission
+            requestPermissions(mPermDeniedList);
         }
     }
-    private void checkPermission(List<String> access, int requestCode) {
+
+    private void requestPermissions(List<String> access) {
+        // Convert List to Array for use in requesting permissions
         String[] stringArray = access.toArray(new String[access.size()]);
-        ActivityCompat.requestPermissions(this, stringArray, requestCode);
+        ActivityCompat.requestPermissions(this, stringArray, 1001);
     }
 
-    private boolean isPermGranted(String perm) {
-        return Build.VERSION.SDK_INT < Build.VERSION_CODES.M || ContextCompat.checkSelfPermission(BookScannerActivity.this, perm) == PackageManager.PERMISSION_GRANTED;
+    // Method to check if a permission is granted
+    private boolean isPermGranted() {
+        return ContextCompat.checkSelfPermission(BookScannerActivity.this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED;
     }
+
+    // Handle permission request result
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode ==  1001) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                mScannerView = new ZXingScannerView(this);   // Programmatically initialize the scanner view
-                setContentView(mScannerView);                // Set the scanner view as the content view
+                // Initialize the scanner view
+                mScannerView = new ZXingScannerView(this);
+                setContentView(mScannerView);
             }
         }
     }
@@ -63,8 +60,10 @@ public class BookScannerActivity extends AppCompatActivity implements ZXingScann
     public void onResume() {
         super.onResume();
         if(mScannerView!=null) {
-            mScannerView.setResultHandler(this); // Register ourselves as a handler for scan results.
-            mScannerView.startCamera();          // Start camera on resume
+            // Register ourselves as a handler for scan results.
+            mScannerView.setResultHandler(this);
+            // Start camera on resume
+            mScannerView.startCamera();
         }
     }
 
@@ -72,18 +71,21 @@ public class BookScannerActivity extends AppCompatActivity implements ZXingScann
     public void onPause() {
         super.onPause();
         if(mScannerView!=null) {
-            mScannerView.stopCamera();// Stop camera on pause
+            // Stop camera on pause
+            mScannerView.stopCamera();
         }
     }
 
     @Override
     public void handleResult(Result rawResult) {
-        // Do something with the result here
-        Log.v("Result", rawResult.getText()); // Prints scan results
-        Log.v("Barcode", rawResult.getBarcodeFormat().toString()); // Prints the scan format (qrcode, pdf417 etc.)
+        // Log results
+        Log.v("Bookopedia", rawResult.getText());
+        Log.v("Bookopedia", rawResult.getBarcodeFormat().toString());
+        // Put result as extra to Intent and go back to previous activity, where results will be handled
         Intent result = getIntent();
         result.putExtra("bar_code",rawResult.getText() );
         this.setResult(1000,result);
+        // Close activity
         finish();
     }
 }
