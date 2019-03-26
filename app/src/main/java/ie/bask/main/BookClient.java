@@ -1,7 +1,11 @@
 package ie.bask.main;
 
+import android.util.Log;
+
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
+
+import org.apache.commons.validator.routines.ISBNValidator;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -21,7 +25,12 @@ public class BookClient {
     // Method for accessing the search API
     public void getBooks(final String query, JsonHttpResponseHandler handler) {
         try {
-            String url = getApiUrl("volumes?q=" + URLEncoder.encode(query, "utf-8"));
+            String url;
+            if(ISBNValidator.getInstance().isValid(query)){
+                url = getApiUrl("volumes?q=isbn:" + URLEncoder.encode(query, "utf-8"));
+            } else {
+                url = getApiUrl("volumes?q=" + URLEncoder.encode(query, "utf-8"));
+            }
             client.get(url, handler);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
