@@ -1,7 +1,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="ie.bask.activities.BookListActivity">
+    tools:context="ie.bask.fragments.BookSearchFragment">
 
     <item
         android:id="@+id/action_search"
@@ -9,18 +9,6 @@
         android:title="@string/menu_search"
         app:actionViewClass="android.support.v7.widget.SearchView"
         app:showAsAction="always|collapseActionView" />
-
-    <item
-        android:id="@+id/action_home"
-        android:icon="@drawable/ic_home"
-        android:title="@string/menu_home"
-        app:showAsAction="always" />
-
-    <item
-        android:id="@+id/action_to_read"
-        android:icon="@drawable/ic_to_read"
-        android:title="@string/books_to_read"
-        app:showAsAction="always" />
 
     <item
         android:id="@+id/action_clear"
@@ -33,9 +21,5 @@
         android:icon="@drawable/ic_delete"
         android:title="@string/delete_book"
         app:showAsAction="always" />
-
-    <item
-        android:id="@+id/action_logout"
-        android:title="@string/logout"/>
 
 </menu>

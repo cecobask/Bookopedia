@@ -6,7 +6,9 @@ import android.location.Geocoder;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -56,6 +58,11 @@ public class MapsFragment extends SupportMapFragment implements
             // Assign the book object to a local variable for ease of use
             book = (Book) getArguments().getSerializable("book");
         }
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater layoutInflater, ViewGroup viewGroup, Bundle bundle) {
+        return super.onCreateView(layoutInflater, viewGroup, bundle);
     }
 
     @Override

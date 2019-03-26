@@ -8,24 +8,19 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 
-import ie.bask.activities.BookListActivity;
 import ie.bask.activities.LoginActivity;
+import ie.bask.fragments.BookSearchFragment;
 import ie.bask.models.Book;
 
 public class Base extends AppCompatActivity {
 
     public BookopediaApp app;
-    public ProgressBar pbSearch;
-    public TextView tvNoResults;
-
 
     @Override
     public void onBackPressed() {
@@ -71,7 +66,7 @@ public class Base extends AppCompatActivity {
                 // If the user deletes the last book in his list
                 if (!dataSnapshot.exists()) {
                     finishAffinity();
-                    startActivity(new Intent(getApplicationContext(), BookListActivity.class));
+                    startActivity(new Intent(getApplicationContext(), BookSearchFragment.class));
                 } else {
                     ((Activity) context).finish();
                 }
@@ -88,7 +83,7 @@ public class Base extends AppCompatActivity {
         app.booksToReadDb.removeValue();
         app.booksToRead.clear();
         Toast.makeText(context, "All books deleted", Toast.LENGTH_SHORT).show();
-        Intent homeIntent = new Intent(context, BookListActivity.class);
+        Intent homeIntent = new Intent(context, BookSearchFragment.class);
         // Start home activity
         startActivity(homeIntent);
         finishAffinity();

@@ -1,20 +1,20 @@
-package ie.bask.activities;
+package ie.bask.fragments;
 
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -30,15 +30,13 @@ import java.util.Iterator;
 
 import ie.bask.R;
 import ie.bask.adapters.PicassoTrustAll;
-import ie.bask.fragments.MapsFragment;
-import ie.bask.main.Base;
 import ie.bask.main.BookopediaApp;
 import ie.bask.models.Book;
 import ie.bask.models.Coordinates;
 import mumayank.com.airlocationlibrary.AirLocation;
 
 
-public class BookInfoActivity extends Base {
+public class BookInfoFragment extends Fragment {
     private ImageView ivBookCover;
     private TextView tvTitle;
     private TextView tvAuthor;
@@ -53,34 +51,71 @@ public class BookInfoActivity extends Base {
     private Button btnAddNotes;
     private boolean bookInList;
     private FrameLayout mapFrame;
+    private BookopediaApp app = BookopediaApp.getInstance();
+    private Book book;
+
+    public static BookInfoFragment newInstance(Book book) {
+        BookInfoFragment fragment = new BookInfoFragment();
+        Bundle args = new Bundle();
+        args.putSerializable("book_info_key", book);
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_book_info);
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        app = (BookopediaApp) getApplication();
-        ivBookCover = findViewById(R.id.ivBookCover);
-        tvTitle = findViewById(R.id.tvTitle);
-        tvAuthor = findViewById(R.id.tvAuthor);
-        tvPublisher = findViewById(R.id.tvPublisher);
-        tvPageCount = findViewById(R.id.tvPageCount);
-        tvDescription = findViewById(R.id.tvDescription);
-        btnToRead = findViewById(R.id.btnToRead);
-        tvDateAdded = findViewById(R.id.tvDateAdded);
-        tvNotes = findViewById(R.id.tvNotes);
-        hrView = findViewById(R.id.hrView2);
-        tvNotesLabel = findViewById(R.id.tvNotesLabel);
-        btnAddNotes = findViewById(R.id.btnAddNotes);
-        mapFrame = findViewById(R.id.mapFrame);
+        if (getArguments() != null) {
+            book = (Book) getArguments().getSerializable("book_info_key");
+        }
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.activity_book_info, container, false);
+        ivBookCover = view.findViewById(R.id.ivBookCover);
+        tvTitle = view.findViewById(R.id.tvTitle);
+        tvAuthor = view.findViewById(R.id.tvAuthor);
+        tvPublisher = view.findViewById(R.id.tvPublisher);
+        tvPageCount = view.findViewById(R.id.tvPageCount);
+        tvDescription = view.findViewById(R.id.tvDescription);
+        btnToRead = view.findViewById(R.id.btnToRead);
+        tvDateAdded = view.findViewById(R.id.tvDateAdded);
+        tvNotes = view.findViewById(R.id.tvNotes);
+        hrView = view.findViewById(R.id.hrView2);
+        tvNotesLabel = view.findViewById(R.id.tvNotesLabel);
+        btnAddNotes = view.findViewById(R.id.btnAddNotes);
+        mapFrame = view.findViewById(R.id.mapFrame);
+        setHasOptionsMenu(true);
+
+        return view;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        if (getArguments() != null) {
+            book = (Book) getArguments().getSerializable("book_info_key");
+            loadBook(book);
+        }
+
+        // Listen for clicks
+        setBookToReadListener(book);
+        setAddNoteListener(book);
     }
 
     // Populate data for the book
     private void loadBook(Book book) {
         if (!book.toReadStatus()) {
-            //change activity title
-            this.setTitle(book.getTitle());
+            // Change activity title
+            getActivity().setTitle(book.getTitle());
             btnToRead.setVisibility(View.VISIBLE);
             hrView.setVisibility(View.VISIBLE);
             tvDateAdded.setVisibility(View.GONE);
@@ -89,7 +124,7 @@ public class BookInfoActivity extends Base {
             tvNotes.setVisibility(View.GONE);
 
             // Populate data
-            PicassoTrustAll.getInstance(getApplicationContext())
+            PicassoTrustAll.getInstance(getContext())
                     .load(Uri.parse(book.getImageLink()))
                     .fit()
                     .centerInside()
@@ -104,7 +139,7 @@ public class BookInfoActivity extends Base {
             for(Book elem: app.booksToRead){
                 if(elem.getBookId().equals(book.getBookId())){
                     btnToRead.setText(getString(R.string.book_added));
-                    btnToRead.getBackground().setColorFilter(getColor(R.color.md_green_200), PorterDuff.Mode.MULTIPLY);
+                    btnToRead.getBackground().setColorFilter(getContext().getColor(R.color.md_green_200), PorterDuff.Mode.MULTIPLY);
                     bookInList = true;
                 } else {
                     btnToRead.setText(getString(R.string.to_read_button));
@@ -112,13 +147,13 @@ public class BookInfoActivity extends Base {
                     bookInList = false;
                 }
             }
-            invalidateOptionsMenu();
+            getActivity().invalidateOptionsMenu();
 
             // Hide map layout
             mapFrame.setVisibility(View.GONE);
         } else {
             // Change activity title
-            this.setTitle(book.getTitle());
+            getActivity().setTitle(book.getTitle());
             // Hide/show widgets
             btnToRead.setVisibility(View.GONE);
             hrView.setVisibility(View.GONE);
@@ -127,7 +162,7 @@ public class BookInfoActivity extends Base {
             tvNotes.setVisibility(View.VISIBLE);
 
             // Populate data
-            PicassoTrustAll.getInstance(getApplicationContext())
+            PicassoTrustAll.getInstance(getContext())
                     .load(Uri.parse(book.getImageLink()))
                     .fit()
                     .centerInside()
@@ -142,62 +177,57 @@ public class BookInfoActivity extends Base {
             if (!book.getNotes().equals("0")) {
                 tvNotes.setText(book.getNotes());
             }
-            invalidateOptionsMenu();
+            getActivity().invalidateOptionsMenu();
 
             // Show map with book location
-            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.replace(R.id.map, MapsFragment.newInstance(book));
+            FragmentTransaction ft = getChildFragmentManager().beginTransaction();
+            ft.replace(R.id.mapFrame, MapsFragment.newInstance(book));
             ft.commit();
         }
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        final MenuItem searchItem = menu.findItem(R.id.action_search);
-        final MenuItem toReadItem = menu.findItem(R.id.action_to_read);
-        final MenuItem clearBooksItem = menu.findItem(R.id.action_clear);
-        final MenuItem deleteBookItem = menu.findItem(R.id.action_delete);
+//    @Override
+//    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+//        inflater.inflate(R.menu.menu_main, menu);
+//        final MenuItem searchItem = menu.findItem(R.id.action_search);
+//        final MenuItem clearBooksItem = menu.findItem(R.id.action_clear);
+//        final MenuItem deleteBookItem = menu.findItem(R.id.action_delete);
+//
+//        // Hide menu items
+//        if (book.toReadStatus()){
+//            deleteBookItem.setVisible(true);
+//        } else {
+//            deleteBookItem.setVisible(false);
+//        }
+//        searchItem.setVisible(false);
+//        clearBooksItem.setVisible(false);
+//        super.onCreateOptionsMenu(menu, inflater);
+//    }
 
-        // Hide menu items
-        Book book = (Book) getIntent().getSerializableExtra("book_info_key");
-        if (book.toReadStatus()){
-            deleteBookItem.setVisible(true);
-        } else {
-            deleteBookItem.setVisible(false);
-        }
-        searchItem.setVisible(false);
-        clearBooksItem.setVisible(false);
-        if (app.booksToRead.isEmpty()) {
-            toReadItem.setVisible(false);
-        }
-
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        switch (id) {
-            case (R.id.action_home):
-                Intent goHome = new Intent(getApplicationContext(), BookListActivity.class);
-                startActivity(goHome);
-                break;
-            case (R.id.action_to_read):
-                Intent toReadIntent = new Intent(getApplicationContext(), ToReadBooksActivity.class);
-                startActivity(toReadIntent);
-                break;
-            case (R.id.action_delete):
-                showDialog(BookInfoActivity.this, "Delete book?", "deleteBook");
-                break;
-            case (R.id.action_logout):
-                showDialog(BookInfoActivity.this, "You are about to log out. Proceed?", "signOut");
-                break;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
+//
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        int id = item.getItemId();
+//
+//        switch (id) {
+//            case (R.id.action_home):
+//                Intent goHome = new Intent(getApplicationContext(), BookSearchFragment.class);
+//                startActivity(goHome);
+//                break;
+//            case (R.id.action_to_read):
+//                Intent toReadIntent = new Intent(getApplicationContext(), WishlistFragment.class);
+//                startActivity(toReadIntent);
+//                break;
+//            case (R.id.action_delete):
+//                showDialog(BookInfoFragment.this, "Delete book?", "deleteBook");
+//                break;
+//            case (R.id.action_logout):
+//                showDialog(BookInfoFragment.this, "You are about to log out. Proceed?", "signOut");
+//                break;
+//        }
+//
+//        return super.onOptionsItemSelected(item);
+//    }
 
     private void setBookToReadListener(final Book book) {
         btnToRead.setOnClickListener(new View.OnClickListener() {
@@ -205,7 +235,7 @@ public class BookInfoActivity extends Base {
             public void onClick(View view) {
                 if(!bookInList) {
                     // Fetch location
-                    AirLocation location = new AirLocation(BookInfoActivity.this, true, true, new AirLocation.Callbacks() {
+                    AirLocation location = new AirLocation(getActivity(), true, true, new AirLocation.Callbacks() {
                         @Override
                         public void onSuccess(@NotNull Location location) {
                             // Store latitude and longitude
@@ -216,11 +246,11 @@ public class BookInfoActivity extends Base {
                             Book bookToRead = new Book(book.getBookId(), book.getAuthor(), book.getTitle(), book.getImageLink(),
                                     book.getDescription(), book.getPublisher(), book.getNumPages(), currentDate, "0", true, coordinates);
                             addBookToRead(bookToRead);
-                            invalidateOptionsMenu();
+                            getActivity().invalidateOptionsMenu();
 
                             bookInList = true;
                             btnToRead.setText(getString(R.string.book_added));
-                            btnToRead.getBackground().setColorFilter(getColor(R.color.md_green_200), PorterDuff.Mode.MULTIPLY);
+                            btnToRead.getBackground().setColorFilter(getActivity().getColor(R.color.md_green_200), PorterDuff.Mode.MULTIPLY);
                         }
 
                         @Override
@@ -230,7 +260,7 @@ public class BookInfoActivity extends Base {
                     });
                 } else {
                     removeBookToRead(book);
-                    invalidateOptionsMenu();
+                    getActivity().invalidateOptionsMenu();
                     bookInList = false;
                     btnToRead.setText(getString(R.string.to_read_button));
                     btnToRead.getBackground().setColorFilter(Color.parseColor("#ffd6d7d7"), PorterDuff.Mode.MULTIPLY);
@@ -243,7 +273,7 @@ public class BookInfoActivity extends Base {
         // Adding the book to Firebase Database
         app.booksToReadDb.child(book.getBookId()).setValue(book);
         app.booksToRead.add(book);
-        Toast.makeText(getApplicationContext(), "Book added to TO READ list", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), "Book added to TO READ list", Toast.LENGTH_SHORT).show();
     }
 
     private void removeBookToRead(Book book) {
@@ -256,16 +286,16 @@ public class BookInfoActivity extends Base {
         }
         app.booksToReadDb.child(book.getBookId()).removeValue();
 
-        Toast.makeText(getApplicationContext(), "Book removed from TO READ list", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), "Book removed from TO READ list", Toast.LENGTH_SHORT).show();
     }
 
     public void setAddNoteListener(final Book book) {
         tvNotes.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                LayoutInflater li = LayoutInflater.from(BookInfoActivity.this);
+                LayoutInflater li = LayoutInflater.from(getContext());
                 final View promptsView = li.inflate(R.layout.alert_dialog, null);
-                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(BookInfoActivity.this);
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getContext());
                 // Set layout alert_dialog.xml to AlertDialog
                 alertDialogBuilder.setView(promptsView);
 
@@ -300,9 +330,9 @@ public class BookInfoActivity extends Base {
         btnAddNotes.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                LayoutInflater li = LayoutInflater.from(BookInfoActivity.this);
+                LayoutInflater li = LayoutInflater.from(getContext());
                 View promptsView = li.inflate(R.layout.alert_dialog, null);
-                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(BookInfoActivity.this);
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getContext());
                 // Set layout alert_dialog.xml to AlertDialog
                 alertDialogBuilder.setView(promptsView);
 
@@ -333,16 +363,5 @@ public class BookInfoActivity extends Base {
         });
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
 
-        // Use the book to populate the data into our views
-        Book book = (Book) getIntent().getSerializableExtra("book_info_key");
-        loadBook(book);
-
-        // Listen for clicks
-        setBookToReadListener(book);
-        setAddNoteListener(book);
-    }
 }

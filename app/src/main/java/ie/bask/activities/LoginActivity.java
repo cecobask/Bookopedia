@@ -74,7 +74,7 @@ public class LoginActivity extends Base implements View.OnClickListener {
             // Getting reference of nodes
             loadBooks(currentUser.getUid());
             finish();
-            startActivity(new Intent(LoginActivity.this, BookListActivity.class));
+            startActivity(new Intent(LoginActivity.this, MainActivity.class));
         }
 
         // Set onClick listeners to buttons
@@ -117,7 +117,7 @@ public class LoginActivity extends Base implements View.OnClickListener {
                         if (task.isSuccessful()) {
                             loadBooks(task.getResult().getUser().getUid());
                             finish();
-                            startActivity(new Intent(getApplicationContext(), BookListActivity.class));
+                            startActivity(new Intent(getApplicationContext(), MainActivity.class));
                         } else {
                             Toast.makeText(getApplicationContext(), task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                         }
@@ -210,7 +210,7 @@ public class LoginActivity extends Base implements View.OnClickListener {
                             loadBooks(user.getUid());
                             progressBar.setVisibility(View.GONE);
                             finish();
-                            startActivity(new Intent(LoginActivity.this, BookListActivity.class));
+                            startActivity(new Intent(LoginActivity.this, MainActivity.class));
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.v("Bookopedia", "signInWithCredential:failure", task.getException());

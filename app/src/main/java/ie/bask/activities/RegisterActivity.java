@@ -23,6 +23,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 
 import ie.bask.R;
+import ie.bask.fragments.BookSearchFragment;
 import ie.bask.main.Base;
 import ie.bask.main.BookopediaApp;
 import ie.bask.models.Book;
@@ -47,7 +48,7 @@ public class RegisterActivity extends Base implements View.OnClickListener {
         if (app.firebaseAuth.getCurrentUser() != null) {
             // That means user is already logged in
             finish();
-            startActivity(new Intent(RegisterActivity.this, BookListActivity.class));
+            startActivity(new Intent(RegisterActivity.this, BookSearchFragment.class));
         }
 
         // Initialising widgets
@@ -142,7 +143,7 @@ public class RegisterActivity extends Base implements View.OnClickListener {
 
                                 // Close activity
                                 finish();
-                                startActivity(new Intent(RegisterActivity.this, BookListActivity.class));
+                                startActivity(new Intent(RegisterActivity.this, BookSearchFragment.class));
                             } else {
                                 Toast.makeText(RegisterActivity.this, task.getException().getMessage(), Toast.LENGTH_LONG).show();
                             }

@@ -20,18 +20,22 @@
         android:theme="@style/MyTheme"
         tools:ignore="GoogleAppIndexingWarning">
         <activity
-            android:name=".activities.ToReadBooksActivity"
-            android:label="@string/label_to_read" />
-        <activity android:name=".activities.BookInfoActivity" />
+            android:name=".activities.MainActivity"
+            android:windowSoftInputMode="adjustPan"></activity>
         <activity
-            android:name=".activities.BookListActivity"
-            android:label="@string/app_name" />
+            android:name=".fragments.WishlistFragment"
+            android:label="@string/label_to_read" />
+        <activity android:name=".fragments.BookInfoFragment" />
+        <!--<activity-->
+        <!--android:name=".activities.BookSearchFragment"-->
+        <!--android:label="@string/app_name" />-->
         <activity android:name=".main.Base" />
         <activity
             android:name=".activities.LoginActivity"
             android:windowSoftInputMode="adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -50,7 +54,9 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
-        <uses-library android:name="org.apache.http.legacy" android:required="false"/>
+        <uses-library
+            android:name="org.apache.http.legacy"
+            android:required="false" />
     </application>
 
 </manifest>
