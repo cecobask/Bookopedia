@@ -4,11 +4,7 @@ package ie.bask.fragments;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -36,7 +32,7 @@ public class MapsFragment extends SupportMapFragment implements
 
     private Book book;
     private GoogleMap mMap;
-    private BookopediaApp app = BookopediaApp.getInstance();
+    private final BookopediaApp app = BookopediaApp.getInstance();
 
     public MapsFragment() {
         // Required empty public constructor
@@ -58,16 +54,6 @@ public class MapsFragment extends SupportMapFragment implements
             // Assign the book object to a local variable for ease of use
             book = (Book) getArguments().getSerializable("book");
         }
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater layoutInflater, ViewGroup viewGroup, Bundle bundle) {
-        return super.onCreateView(layoutInflater, viewGroup, bundle);
-    }
-
-    @Override
-    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
     }
 
     @Override
@@ -115,7 +101,7 @@ public class MapsFragment extends SupportMapFragment implements
         mMap.getUiSettings().setZoomControlsEnabled(true);
     }
 
-    public void initListeners() {
+    private void initListeners() {
         mMap.setOnMarkerClickListener(this);
         mMap.setOnInfoWindowClickListener(this);
         mMap.setOnMapClickListener(this);
@@ -142,7 +128,7 @@ public class MapsFragment extends SupportMapFragment implements
         addBooks();
     }
 
-    public void addBooks(){
+    private void addBooks(){
         for(Book bookElem : app.booksToRead)
             mMap.addMarker(new MarkerOptions()
                     .position(new LatLng(bookElem.getCoordinates().getLatitude(), bookElem.getCoordinates().getLongitude()))

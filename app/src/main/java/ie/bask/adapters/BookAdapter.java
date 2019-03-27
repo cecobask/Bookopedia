@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import ie.bask.R;
 import ie.bask.activities.MainActivity;
 import ie.bask.fragments.BookInfoFragment;
-import ie.bask.fragments.BookSearchFragment;
 import ie.bask.main.BookopediaApp;
 import ie.bask.models.Book;
 
@@ -30,7 +29,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookViewHolder> {
 
     ArrayList<Book> booksArray;
     private LayoutInflater mInflater;
-    private Context context;
+    private final Context context;
     private boolean multiSelect = false;
     private ArrayList<Book> selectedItems = new ArrayList<>();
 
@@ -116,12 +115,8 @@ public class BookAdapter extends RecyclerView.Adapter<BookViewHolder> {
                                         actionMode.finish();
 
                                         if (booksArray.isEmpty()){
-                                            BookSearchFragment fragment = BookSearchFragment.newInstance();
-                                            ((AppCompatActivity) context).getSupportFragmentManager()
-                                                    .beginTransaction()
-                                                    .replace(R.id.flContent, fragment)
-                                                    .commit();
-                                            MainActivity.getInstance().currentFragment = fragment;
+                                            MainActivity.getInstance()
+                                                    .selectDrawerItem(MainActivity.nvDrawer.getMenu().findItem(R.id.nav_home));
                                         }
                                     }
                                 });
@@ -155,11 +150,9 @@ public class BookAdapter extends RecyclerView.Adapter<BookViewHolder> {
                             .replace(R.id.flContent, fragment)
                             .commit();
 
-                    // Access MainActivity's context for using variables in that activity
-                    MainActivity MainActivityContext = MainActivity.getInstance();
                     // Set current fragment
-                    MainActivityContext.currentFragment = fragment;
-                    NavigationView nvDrawer = MainActivityContext.nvDrawer;
+                    MainActivity.currentFragment = fragment;
+                    NavigationView nvDrawer = MainActivity.nvDrawer;
                     nvDrawer.getMenu().findItem(R.id.nav_wishlist).setChecked(false);
                 }
             }

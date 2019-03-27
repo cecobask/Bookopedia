@@ -3,6 +3,8 @@ package ie.bask.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
+import android.support.v7.app.AppCompatActivity;
 import android.text.InputFilter;
 import android.text.TextUtils;
 import android.util.Log;
@@ -12,7 +14,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
-import android.widget.Toast;
+import android.widget.RelativeLayout;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -23,13 +25,11 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 
 import ie.bask.R;
-import ie.bask.fragments.BookSearchFragment;
-import ie.bask.main.Base;
 import ie.bask.main.BookopediaApp;
 import ie.bask.models.Book;
 import ie.bask.models.User;
 
-public class RegisterActivity extends Base implements View.OnClickListener {
+public class RegisterActivity extends AppCompatActivity implements View.OnClickListener {
 
     // Widgets
     private EditText editTextEmail;
@@ -38,6 +38,8 @@ public class RegisterActivity extends Base implements View.OnClickListener {
     private AutoCompleteTextView autoCompleteCounty;
     private Button buttonRegister;
     private ProgressBar progressBar;
+    private BookopediaApp app;
+    private RelativeLayout mLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,7 +50,7 @@ public class RegisterActivity extends Base implements View.OnClickListener {
         if (app.firebaseAuth.getCurrentUser() != null) {
             // That means user is already logged in
             finish();
-            startActivity(new Intent(RegisterActivity.this, BookSearchFragment.class));
+            startActivity(new Intent(RegisterActivity.this, MainActivity.class));
         }
 
         // Initialising widgets
@@ -58,6 +60,7 @@ public class RegisterActivity extends Base implements View.OnClickListener {
         autoCompleteCounty = findViewById(R.id.autoCompleteCounty);
         buttonRegister = findViewById(R.id.buttonRegister);
         progressBar = findViewById(R.id.pbSearch);
+        mLayout = findViewById(R.id.relLayRoot2);
 
         // Load string-array from resources to give suggestions
         // to the user when they start typing
@@ -121,6 +124,7 @@ public class RegisterActivity extends Base implements View.OnClickListener {
 
             // If the email and password are not empty
             // display a ProgressBar
+            mLayout.setAlpha(0.5f);
             progressBar.setVisibility(View.VISIBLE);
 
             // Creating a new user
@@ -143,10 +147,11 @@ public class RegisterActivity extends Base implements View.OnClickListener {
 
                                 // Close activity
                                 finish();
-                                startActivity(new Intent(RegisterActivity.this, BookSearchFragment.class));
+                                startActivity(new Intent(RegisterActivity.this, MainActivity.class));
                             } else {
-                                Toast.makeText(RegisterActivity.this, task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                                Snackbar.make(buttonRegister, task.getException().getMessage(), Snackbar.LENGTH_SHORT).show();
                             }
+                            mLayout.setAlpha(1f);
                             progressBar.setVisibility(View.GONE);
                         }
                     });
@@ -167,7 +172,7 @@ public class RegisterActivity extends Base implements View.OnClickListener {
     }
 
     // Load Firebase database
-    public void loadBooks() {
+    private void loadBooks() {
         app.booksToReadDb = app.usersDb.child(app.firebaseAuth.getCurrentUser().getUid()).child("booksToRead");
         app.bookResultsDb = app.usersDb.child(app.firebaseAuth.getCurrentUser().getUid()).child("bookResults");
 

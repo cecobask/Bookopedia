@@ -35,13 +35,13 @@ public class PicassoTrustAll {
             @Override
             public void checkClientTrusted(
                     java.security.cert.X509Certificate[] x509Certificates,
-                    String s) throws java.security.cert.CertificateException {
+                    String s) {
             }
 
             @Override
             public void checkServerTrusted(
                     java.security.cert.X509Certificate[] x509Certificates,
-                    String s) throws java.security.cert.CertificateException {
+                    String s) {
             }
 
             @Override

@@ -1,7 +1,5 @@
 package ie.bask.main;
 
-import android.util.Log;
-
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 

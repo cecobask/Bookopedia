@@ -1,5 +1,6 @@
 package ie.bask.fragments;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -8,9 +9,12 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,7 +24,6 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -29,6 +32,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Iterator;
 
 import ie.bask.R;
+import ie.bask.activities.MainActivity;
 import ie.bask.adapters.PicassoTrustAll;
 import ie.bask.main.BookopediaApp;
 import ie.bask.models.Book;
@@ -44,6 +48,7 @@ public class BookInfoFragment extends Fragment {
     private TextView tvPageCount;
     private TextView tvDescription;
     private Button btnToRead;
+    private Button btnRemove;
     private TextView tvDateAdded;
     private TextView tvNotes;
     private View hrView;
@@ -53,6 +58,7 @@ public class BookInfoFragment extends Fragment {
     private FrameLayout mapFrame;
     private BookopediaApp app = BookopediaApp.getInstance();
     private Book book;
+    private Context mContext;
 
     public static BookInfoFragment newInstance(Book book) {
         BookInfoFragment fragment = new BookInfoFragment();
@@ -60,6 +66,12 @@ public class BookInfoFragment extends Fragment {
         args.putSerializable("book_info_key", book);
         fragment.setArguments(args);
         return fragment;
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mContext = context;
     }
 
     @Override
@@ -81,6 +93,7 @@ public class BookInfoFragment extends Fragment {
         tvPageCount = view.findViewById(R.id.tvPageCount);
         tvDescription = view.findViewById(R.id.tvDescription);
         btnToRead = view.findViewById(R.id.btnToRead);
+        btnRemove = view.findViewById(R.id.btnRemove);
         tvDateAdded = view.findViewById(R.id.tvDateAdded);
         tvNotes = view.findViewById(R.id.tvNotes);
         hrView = view.findViewById(R.id.hrView2);
@@ -88,35 +101,41 @@ public class BookInfoFragment extends Fragment {
         btnAddNotes = view.findViewById(R.id.btnAddNotes);
         mapFrame = view.findViewById(R.id.mapFrame);
         setHasOptionsMenu(true);
-
         return view;
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-
     }
 
     @Override
     public void onResume() {
         super.onResume();
 
-        if (getArguments() != null) {
+        Bundle arguments = getArguments();
+        if (arguments != null && arguments.containsKey("book_info_key")) {
             book = (Book) getArguments().getSerializable("book_info_key");
             loadBook(book);
         }
 
         // Listen for clicks
-        setBookToReadListener(book);
+        setButtonListeners(book);
         setAddNoteListener(book);
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mContext = null;
     }
 
     // Populate data for the book
     private void loadBook(Book book) {
         if (!book.toReadStatus()) {
             // Change activity title
-            getActivity().setTitle(book.getTitle());
+            ((AppCompatActivity) mContext).setTitle(book.getTitle());
             btnToRead.setVisibility(View.VISIBLE);
+            btnRemove.setVisibility(View.GONE);
             hrView.setVisibility(View.VISIBLE);
             tvDateAdded.setVisibility(View.GONE);
             tvNotesLabel.setVisibility(View.GONE);
@@ -124,7 +143,7 @@ public class BookInfoFragment extends Fragment {
             tvNotes.setVisibility(View.GONE);
 
             // Populate data
-            PicassoTrustAll.getInstance(getContext())
+            PicassoTrustAll.getInstance(mContext)
                     .load(Uri.parse(book.getImageLink()))
                     .fit()
                     .centerInside()
@@ -139,7 +158,7 @@ public class BookInfoFragment extends Fragment {
             for(Book elem: app.booksToRead){
                 if(elem.getBookId().equals(book.getBookId())){
                     btnToRead.setText(getString(R.string.book_added));
-                    btnToRead.getBackground().setColorFilter(getContext().getColor(R.color.md_green_200), PorterDuff.Mode.MULTIPLY);
+                    btnToRead.getBackground().setColorFilter(mContext.getColor(R.color.md_green_200), PorterDuff.Mode.MULTIPLY);
                     bookInList = true;
                 } else {
                     btnToRead.setText(getString(R.string.to_read_button));
@@ -147,22 +166,22 @@ public class BookInfoFragment extends Fragment {
                     bookInList = false;
                 }
             }
-            getActivity().invalidateOptionsMenu();
 
             // Hide map layout
             mapFrame.setVisibility(View.GONE);
         } else {
             // Change activity title
-            getActivity().setTitle(book.getTitle());
+            ((AppCompatActivity) mContext).setTitle(book.getTitle());
             // Hide/show widgets
             btnToRead.setVisibility(View.GONE);
-            hrView.setVisibility(View.GONE);
+            btnRemove.setVisibility(View.VISIBLE);
+            hrView.setVisibility(View.VISIBLE);
             tvDateAdded.setVisibility(View.VISIBLE);
             btnAddNotes.setVisibility(View.VISIBLE);
             tvNotes.setVisibility(View.VISIBLE);
 
             // Populate data
-            PicassoTrustAll.getInstance(getContext())
+            PicassoTrustAll.getInstance(mContext)
                     .load(Uri.parse(book.getImageLink()))
                     .fit()
                     .centerInside()
@@ -177,7 +196,6 @@ public class BookInfoFragment extends Fragment {
             if (!book.getNotes().equals("0")) {
                 tvNotes.setText(book.getNotes());
             }
-            getActivity().invalidateOptionsMenu();
 
             // Show map with book location
             FragmentTransaction ft = getChildFragmentManager().beginTransaction();
@@ -229,13 +247,13 @@ public class BookInfoFragment extends Fragment {
 //        return super.onOptionsItemSelected(item);
 //    }
 
-    private void setBookToReadListener(final Book book) {
+    private void setButtonListeners(final Book book) {
         btnToRead.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if(!bookInList) {
                     // Fetch location
-                    AirLocation location = new AirLocation(getActivity(), true, true, new AirLocation.Callbacks() {
+                    new AirLocation(((AppCompatActivity) mContext), true, true, new AirLocation.Callbacks() {
                         @Override
                         public void onSuccess(@NotNull Location location) {
                             // Store latitude and longitude
@@ -246,11 +264,10 @@ public class BookInfoFragment extends Fragment {
                             Book bookToRead = new Book(book.getBookId(), book.getAuthor(), book.getTitle(), book.getImageLink(),
                                     book.getDescription(), book.getPublisher(), book.getNumPages(), currentDate, "0", true, coordinates);
                             addBookToRead(bookToRead);
-                            getActivity().invalidateOptionsMenu();
 
                             bookInList = true;
                             btnToRead.setText(getString(R.string.book_added));
-                            btnToRead.getBackground().setColorFilter(getActivity().getColor(R.color.md_green_200), PorterDuff.Mode.MULTIPLY);
+                            btnToRead.getBackground().setColorFilter(mContext.getColor(R.color.md_green_200), PorterDuff.Mode.MULTIPLY);
                         }
 
                         @Override
@@ -260,10 +277,21 @@ public class BookInfoFragment extends Fragment {
                     });
                 } else {
                     removeBookToRead(book);
-                    getActivity().invalidateOptionsMenu();
                     bookInList = false;
                     btnToRead.setText(getString(R.string.to_read_button));
                     btnToRead.getBackground().setColorFilter(Color.parseColor("#ffd6d7d7"), PorterDuff.Mode.MULTIPLY);
+                }
+            }
+        });
+
+        btnRemove.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                removeBookToRead(book);
+                FragmentManager fragmentManager = getFragmentManager();
+                if (fragmentManager != null) {
+                    MainActivity mainActivity = MainActivity.getInstance();
+                    mainActivity.selectDrawerItem(MainActivity.nvDrawer.getMenu().findItem(R.id.nav_home));
                 }
             }
         });
@@ -273,7 +301,8 @@ public class BookInfoFragment extends Fragment {
         // Adding the book to Firebase Database
         app.booksToReadDb.child(book.getBookId()).setValue(book);
         app.booksToRead.add(book);
-        Toast.makeText(getContext(), "Book added to TO READ list", Toast.LENGTH_SHORT).show();
+        Snackbar.make(((AppCompatActivity) mContext).findViewById(R.id.drawer_layout), "Book added to your Wishlist!", Snackbar.LENGTH_SHORT).show();
+        MainActivity.nvDrawer.getMenu().findItem(R.id.nav_wishlist).setEnabled(true);
     }
 
     private void removeBookToRead(Book book) {
@@ -285,17 +314,18 @@ public class BookInfoFragment extends Fragment {
             }
         }
         app.booksToReadDb.child(book.getBookId()).removeValue();
-
-        Toast.makeText(getContext(), "Book removed from TO READ list", Toast.LENGTH_SHORT).show();
+        Snackbar.make(((AppCompatActivity) mContext).findViewById(R.id.drawer_layout), "Book removed from your Wishlist!", Snackbar.LENGTH_SHORT).show();
+        MainActivity.nvDrawer.getMenu().findItem(R.id.nav_wishlist).setEnabled(false);
     }
 
     public void setAddNoteListener(final Book book) {
         tvNotes.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                LayoutInflater li = LayoutInflater.from(getContext());
-                final View promptsView = li.inflate(R.layout.alert_dialog, null);
-                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getContext());
+                LayoutInflater li = LayoutInflater.from(mContext);
+                final ViewGroup nullParent = null;
+                final View promptsView = li.inflate(R.layout.alert_dialog, nullParent);
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(mContext);
                 // Set layout alert_dialog.xml to AlertDialog
                 alertDialogBuilder.setView(promptsView);
 
@@ -330,9 +360,10 @@ public class BookInfoFragment extends Fragment {
         btnAddNotes.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                LayoutInflater li = LayoutInflater.from(getContext());
-                View promptsView = li.inflate(R.layout.alert_dialog, null);
-                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getContext());
+                LayoutInflater li = LayoutInflater.from(mContext);
+                final ViewGroup nullParent = null;
+                View promptsView = li.inflate(R.layout.alert_dialog, nullParent);
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(mContext);
                 // Set layout alert_dialog.xml to AlertDialog
                 alertDialogBuilder.setView(promptsView);
 

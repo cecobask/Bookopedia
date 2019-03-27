@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
@@ -57,12 +58,13 @@ public class BookSearchFragment extends Fragment {
     private ImageView slogan;
     private FloatingActionButton fab;
     private List<String> mPermDeniedList = new ArrayList<>();
-    private BookopediaApp app = BookopediaApp.getInstance();
+    private final BookopediaApp app = BookopediaApp.getInstance();
     private ProgressBar pbSearch;
     private TextView tvNoResults;
     private RecyclerView rvBooks;
     private Context mContext;
     private ValueEventListener valueEventListener;
+    private ConstraintLayout mLayout;
 
     public static BookSearchFragment newInstance() {
         return new BookSearchFragment();
@@ -72,11 +74,7 @@ public class BookSearchFragment extends Fragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         mContext = context;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+        Log.v("Bookopedia", "current: " + MainActivity.currentFragment);
     }
 
     @Nullable
@@ -88,6 +86,7 @@ public class BookSearchFragment extends Fragment {
         fab = view.findViewById(R.id.fab_scan);
         tvNoResults = view.findViewById(R.id.tvNoResults);
         rvBooks = view.findViewById(R.id.rvBooks);
+        mLayout = view.findViewById(R.id.root);
         valueEventListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -102,6 +101,7 @@ public class BookSearchFragment extends Fragment {
                     }
                     ((AppCompatActivity) mContext).invalidateOptionsMenu();
                 } else {
+                    tvNoResults.setVisibility(View.VISIBLE);
                     tvNoResults.setText(getString(R.string.welcome_message));
                     slogan.setVisibility(View.VISIBLE);
                     fab.show();
@@ -191,11 +191,9 @@ public class BookSearchFragment extends Fragment {
                         BookInfoFragment fragment = BookInfoFragment.newInstance(bookExtra);
                         transaction.replace(R.id.flContent, fragment).commit();
 
-                        // Access MainActivity's context for using variables in that activity
-                        MainActivity MainActivityContext = MainActivity.getInstance();
                         // Set current fragment
-                        MainActivityContext.currentFragment = fragment;
-                        NavigationView nvDrawer = MainActivityContext.nvDrawer;
+                        MainActivity.currentFragment = fragment;
+                        NavigationView nvDrawer = MainActivity.nvDrawer;
                         nvDrawer.getMenu().findItem(R.id.nav_home).setChecked(false);
                     }
                 });
@@ -219,7 +217,10 @@ public class BookSearchFragment extends Fragment {
     // Converts them into an array of book objects and adds them to the adapter
     public void getBooks(String query) {
         // Show progress bar if search query is not empty
-        if (query.length() > 0) pbSearch.setVisibility(View.VISIBLE);
+        if (query.length() > 0) {
+            mLayout.setAlpha(0.5f);
+            pbSearch.setVisibility(View.VISIBLE);
+        }
 
         BookClient client = new BookClient();
         client.getBooks(query, new JsonHttpResponseHandler() {
@@ -227,6 +228,7 @@ public class BookSearchFragment extends Fragment {
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 try {
                     // Hide progress bar and TextView
+                    mLayout.setAlpha(1f);
                     pbSearch.setVisibility(View.GONE);
                     tvNoResults.setText(null);
                     slogan.setVisibility(View.GONE);
@@ -251,10 +253,12 @@ public class BookSearchFragment extends Fragment {
                         // Clear results
                         app.booksResults.clear();
                         app.bookResultsDb.removeValue();
+                        tvNoResults.setVisibility(View.VISIBLE);
                         tvNoResults.setText(getString(R.string.no_results));
                         slogan.setVisibility(View.GONE);
                     }
                 } catch (JSONException e) {
+                    mLayout.setAlpha(1f);
                     pbSearch.setVisibility(View.GONE);
                     e.printStackTrace();
                 }
@@ -296,7 +300,7 @@ public class BookSearchFragment extends Fragment {
 
     private void requestPermissions(List<String> access) {
         // Convert List to Array for use in requesting permissions
-        String[] stringArray = access.toArray(new String[access.size()]);
+        String[] stringArray = access.toArray(new String[0]);
         ActivityCompat.requestPermissions((Activity) mContext, stringArray, 1002);
     }
 

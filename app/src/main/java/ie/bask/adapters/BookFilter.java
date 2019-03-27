@@ -7,8 +7,8 @@ import java.util.ArrayList;
 import ie.bask.models.Book;
 
 public class BookFilter extends Filter {
-    private ArrayList<Book> originalBookList;
-    private BookAdapter adapter;
+    private final ArrayList<Book> originalBookList;
+    private final BookAdapter adapter;
 
     public BookFilter(ArrayList<Book> originalBookList, BookAdapter adapter) {
         super();

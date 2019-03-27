@@ -76,6 +76,15 @@
                 android:text="@string/to_read_button"
                 android:paddingHorizontal="@dimen/activity_horizontal_margin"/>
 
+            <Button
+                android:id="@+id/btnRemove"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:paddingHorizontal="@dimen/activity_horizontal_margin"
+                android:text="@string/delete_book" />
+
             <View
                 android:id="@+id/hrView2"
                 android:layout_width="match_parent"

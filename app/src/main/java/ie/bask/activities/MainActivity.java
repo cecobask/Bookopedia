@@ -1,5 +1,6 @@
 package ie.bask.activities;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
@@ -7,10 +8,13 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -24,21 +28,36 @@ import ie.bask.R;
 import ie.bask.fragments.BookInfoFragment;
 import ie.bask.fragments.BookSearchFragment;
 import ie.bask.fragments.WishlistFragment;
-import ie.bask.main.Base;
 import ie.bask.main.BookopediaApp;
 
-public class MainActivity extends Base {
+public class MainActivity extends AppCompatActivity {
     private DrawerLayout mDrawer;
     private Toolbar toolbar;
-    public NavigationView nvDrawer;
+    public static NavigationView nvDrawer;
     private Handler handler = new Handler();
     private Runnable runnable;
+    public static MainActivity mInstance;
 
     // Make sure to be using android.support.v7.app.ActionBarDrawerToggle version.
     // The android.support.v4.app.ActionBarDrawerToggle has been deprecated.
     private ActionBarDrawerToggle drawerToggle;
-    public Fragment currentFragment;
-    private static MainActivity mInstance;
+    public static Fragment currentFragment;
+    private BookopediaApp app;
+
+    public static MainActivity getInstance() {
+        return mInstance;
+    }
+
+    private void setupDrawerContent(NavigationView navigationView) {
+        navigationView.setNavigationItemSelectedListener(
+                new NavigationView.OnNavigationItemSelectedListener() {
+                    @Override
+                    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+                        selectDrawerItem(menuItem);
+                        return true;
+                    }
+                });
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,63 +93,14 @@ public class MainActivity extends Base {
             startActivity(new Intent(this, LoginActivity.class));
         }
 
-        currentFragment = BookSearchFragment.newInstance();
-
         // Load BookSearchFragment as a default on start of app
+        currentFragment = BookSearchFragment.newInstance();
         getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.flContent, currentFragment)
+                .add(R.id.flContent, currentFragment)
                 .commit();
 
         mInstance = this;
-    }
-
-    private void setupDrawerContent(NavigationView navigationView) {
-        navigationView.setNavigationItemSelectedListener(
-                new NavigationView.OnNavigationItemSelectedListener() {
-                    @Override
-                    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-                        selectDrawerItem(menuItem);
-                        return true;
-                    }
-                });
-    }
-
-    public void selectDrawerItem(MenuItem menuItem) {
-        // Specify the fragment class to show based on nav item clicked
-        Class fragmentClass;
-        switch (menuItem.getItemId()) {
-            case R.id.nav_home:
-                fragmentClass = BookSearchFragment.class;
-                break;
-            case R.id.nav_wishlist:
-                fragmentClass = WishlistFragment.class;
-                break;
-            default:
-                fragmentClass = BookSearchFragment.class;
-        }
-
-        try {
-            Log.v("Bookopedia", ""+currentFragment.getClass());
-            if (currentFragment.getClass() != fragmentClass) {
-                // Set new current fragment
-                currentFragment = (Fragment) fragmentClass.newInstance();
-                // Insert the fragment by replacing any existing fragment
-                FragmentManager fragmentManager = getSupportFragmentManager();
-                fragmentManager.beginTransaction().replace(R.id.flContent, currentFragment).commit();
-
-                // Highlight the selected item has been done by NavigationView
-                menuItem.setChecked(true);
-                // Set action bar title
-                setTitle(menuItem.getTitle());
-
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        // Close the navigation drawer
-        mDrawer.closeDrawers();
     }
 
     private ActionBarDrawerToggle setupDrawerToggle() {
@@ -139,28 +109,46 @@ public class MainActivity extends Base {
         return new ActionBarDrawerToggle(this, mDrawer, toolbar, R.string.drawer_open, R.string.drawer_close);
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
+    public void selectDrawerItem(MenuItem menuItem) {
+        // Specify the fragment class to show based on nav item clicked
+        Class fragmentClass = null;
+        switch (menuItem.getItemId()) {
+            case R.id.nav_home:
+                fragmentClass = BookSearchFragment.class;
+                break;
+            case R.id.nav_wishlist:
+                fragmentClass = WishlistFragment.class;
+                break;
+            case R.id.nav_logout:
+                signOut();
+                break;
+        }
 
-        switch (id) {
-            case (R.id.action_clear):
-                if(currentFragment instanceof BookSearchFragment) {
-                    showDialog(MainActivity.this, "searchFragment", "Clear results?", "deleteAllBooks");
-                    invalidateOptionsMenu();
+        try {
+            if (currentFragment.getClass() != fragmentClass) {
+                if (fragmentClass == WishlistFragment.class && app.booksToRead.isEmpty()) {
+                    Snackbar.make(findViewById(R.id.drawer_layout), "No books in your Wishlist!", Snackbar.LENGTH_SHORT).show();
+                    menuItem.setChecked(false);
                 } else {
-                    showDialog(MainActivity.this, "", "Delete all books from Wishlist?", "deleteAllBooks");
-                    ((WishlistFragment)currentFragment).bookAdapter.notifyDataSetChanged();
+                    // Set new current fragment
+                    currentFragment = (Fragment) fragmentClass.newInstance();
+                    // Insert the fragment by replacing any existing fragment
+                    FragmentManager fragmentManager = getSupportFragmentManager();
+                    fragmentManager.beginTransaction().replace(R.id.flContent, currentFragment).commit();
+
+                    // Highlight the selected item has been done by NavigationView
+                    menuItem.setChecked(true);
+                    // Set action bar title
+                    setTitle(menuItem.getTitle());
                 }
-                break;
-            case (R.id.action_delete):
-                showDialog(MainActivity.this, "", "Delete book?", "deleteBook");
-                break;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        if (drawerToggle.onOptionsItemSelected(item)) {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
+
+        // Close the navigation drawer
+        mDrawer.closeDrawers();
+        invalidateOptionsMenu();
     }
 
     // `onPostCreate` called when activity start-up is complete after `onStart()`
@@ -186,21 +174,17 @@ public class MainActivity extends Base {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         final MenuItem searchItem = menu.findItem(R.id.action_search);
         final MenuItem clearBooksItem = menu.findItem(R.id.action_clear);
-        final MenuItem deleteBookItem = menu.findItem(R.id.action_delete);
         final SearchView searchView = (SearchView) searchItem.getActionView();
 
         if (currentFragment instanceof BookInfoFragment) {
             searchItem.setVisible(false);
             clearBooksItem.setVisible(false);
-            deleteBookItem.setVisible(true);
         } else if (currentFragment instanceof BookSearchFragment) {
-            deleteBookItem.setVisible(false);
             clearBooksItem.setVisible(!app.booksResults.isEmpty());
             searchItem.setVisible(true);
         } else if(currentFragment instanceof WishlistFragment) {
             searchItem.setVisible(true);
             clearBooksItem.setVisible(true);
-            deleteBookItem.setVisible(false);
         }
 
         searchView.setMaxWidth(android.R.attr.width);
@@ -249,6 +233,48 @@ public class MainActivity extends Base {
         return true;
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        switch (id) {
+            case (R.id.action_clear):
+                if(currentFragment instanceof BookSearchFragment) {
+                    showDialog("searchFragment", "Clear results?", "deleteAllBooks");
+                } else {
+                    showDialog("", "Delete all books from Wishlist?", "deleteAllBooks");
+                    ((WishlistFragment)currentFragment).bookAdapter.notifyDataSetChanged();
+                }
+                break;
+        }
+        if (drawerToggle.onOptionsItemSelected(item)) {
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        final MenuItem wishlistItem = nvDrawer.getMenu().findItem(R.id.nav_wishlist);
+        // Trick to give enough time for response from Firebase
+        handler.removeCallbacks(runnable);
+        runnable = new Runnable() {
+            @Override
+            public void run() {
+                if (app.booksToRead.isEmpty()) {
+                    wishlistItem.setEnabled(false);
+                } else {
+                    wishlistItem.setEnabled(true);
+                }
+            }
+        };
+        // Delay wishlist check
+        handler.postDelayed(runnable, 500);
+
+
+        return super.onPrepareOptionsMenu(menu);
+    }
+
     // Handle permission request result
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -272,5 +298,82 @@ public class MainActivity extends Base {
         }
     }
 
-    public static MainActivity getInstance() { return mInstance; }
+    @Override
+    protected void onResume() {
+        Log.v("Bookopedia", "+");
+        super.onResume();
+    }
+
+    public void signOut() {
+        app.firebaseAuth.signOut();
+        app.mGoogleSignInClient.signOut();
+        Intent loginIntent = new Intent(MainActivity.this, LoginActivity.class);
+        startActivity(loginIntent);
+        MainActivity.this.finish();
+    }
+
+    public void deleteAllBooks(String fragment) {
+        if (fragment.equals("searchFragment")) {
+            app.booksResults.clear();
+            app.bookResultsDb.removeValue();
+            invalidateOptionsMenu();
+        } else if (fragment.equals("")) {
+            app.booksToReadDb.removeValue();
+            app.booksToRead.clear();
+            Snackbar.make(findViewById(R.id.drawer_layout), "All books deleted!", Snackbar.LENGTH_SHORT).show();
+            // Simulate selection of drawer item
+            selectDrawerItem(nvDrawer.getMenu().findItem(R.id.nav_home));
+        }
+    }
+
+    public void showDialog(final String fragment, String message, final String action) {
+        AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
+        alertDialog.setMessage(message);
+        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "NO",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                    }
+                });
+        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "YES",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (action) {
+                            case ("signOut"):
+                                signOut();
+                                break;
+                            case ("deleteAllBooks"):
+                                deleteAllBooks(fragment);
+                                break;
+                        }
+
+                    }
+                });
+        alertDialog.show();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (currentFragment instanceof BookSearchFragment) {
+            AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+            alertDialog.setMessage("Exit application?");
+            alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "NO",
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            dialogInterface.dismiss();
+                        }
+                    });
+            alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "YES",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            finish();
+                        }
+                    });
+            alertDialog.show();
+        } else {
+            selectDrawerItem(nvDrawer.getMenu().findItem(R.id.nav_home));
+        }
+    }
 }

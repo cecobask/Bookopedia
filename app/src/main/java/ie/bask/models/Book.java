@@ -1,6 +1,5 @@
 package ie.bask.models;
 
-import android.location.Location;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
