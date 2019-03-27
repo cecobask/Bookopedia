@@ -5,6 +5,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.design.widget.NavigationView;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -14,8 +17,11 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 
+import ie.bask.R;
 import ie.bask.activities.LoginActivity;
+import ie.bask.activities.MainActivity;
 import ie.bask.fragments.BookSearchFragment;
+import ie.bask.fragments.WishlistFragment;
 import ie.bask.models.Book;
 
 public class Base extends AppCompatActivity {
@@ -79,17 +85,27 @@ public class Base extends AppCompatActivity {
         });
     }
 
-    public void deleteAllBooks(Context context) {
-        app.booksToReadDb.removeValue();
-        app.booksToRead.clear();
-        Toast.makeText(context, "All books deleted", Toast.LENGTH_SHORT).show();
-        Intent homeIntent = new Intent(context, BookSearchFragment.class);
-        // Start home activity
-        startActivity(homeIntent);
-        finishAffinity();
+    public void deleteAllBooks(Context context, String fragment) {
+        if(fragment.equals("searchFragment")){
+            app.booksResults.clear();
+            app.bookResultsDb.removeValue();
+        } else if (fragment.equals("")) {
+            app.booksToReadDb.removeValue();
+            app.booksToRead.clear();
+            Toast.makeText(context, "All books deleted", Toast.LENGTH_SHORT).show();
+            // Start the search fragment
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            BookSearchFragment bookSearchFragment = BookSearchFragment.newInstance();
+            fragmentManager.beginTransaction().replace(R.id.flContent, bookSearchFragment).commit();
+            MainActivity mainActivity = MainActivity.getInstance();
+            mainActivity.setTitle("Bookopedia");
+            NavigationView nvDrawer = mainActivity.nvDrawer;
+            nvDrawer.getMenu().findItem(R.id.nav_wishlist).setChecked(false);
+            nvDrawer.getMenu().findItem(R.id.nav_home).setChecked(true);
+        }
     }
 
-    public void showDialog(final Context context, String message, final String action) {
+    public void showDialog(final Context context, final String fragment, String message, final String action) {
         AlertDialog alertDialog = new AlertDialog.Builder(context).create();
         alertDialog.setMessage(message);
         alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "NO",
@@ -110,7 +126,7 @@ public class Base extends AppCompatActivity {
                                 deleteBook(context);
                                 break;
                             case("deleteAllBooks"):
-                                deleteAllBooks(context);
+                                deleteAllBooks(context, fragment);
                                 break;
                         }
 

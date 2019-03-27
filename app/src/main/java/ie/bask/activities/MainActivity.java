@@ -37,7 +37,7 @@ public class MainActivity extends Base {
     // Make sure to be using android.support.v7.app.ActionBarDrawerToggle version.
     // The android.support.v4.app.ActionBarDrawerToggle has been deprecated.
     private ActionBarDrawerToggle drawerToggle;
-    private Fragment currentFragment;
+    public Fragment currentFragment;
     private static MainActivity mInstance;
 
     @Override
@@ -145,9 +145,16 @@ public class MainActivity extends Base {
 
         switch (id) {
             case (R.id.action_clear):
-                app.booksResults.clear();
-                app.bookResultsDb.removeValue();
-                invalidateOptionsMenu();
+                if(currentFragment instanceof BookSearchFragment) {
+                    showDialog(MainActivity.this, "searchFragment", "Clear results?", "deleteAllBooks");
+                    invalidateOptionsMenu();
+                } else {
+                    showDialog(MainActivity.this, "", "Delete all books from Wishlist?", "deleteAllBooks");
+                    ((WishlistFragment)currentFragment).bookAdapter.notifyDataSetChanged();
+                }
+                break;
+            case (R.id.action_delete):
+                showDialog(MainActivity.this, "", "Delete book?", "deleteBook");
                 break;
         }
         if (drawerToggle.onOptionsItemSelected(item)) {
@@ -183,11 +190,17 @@ public class MainActivity extends Base {
         final SearchView searchView = (SearchView) searchItem.getActionView();
 
         if (currentFragment instanceof BookInfoFragment) {
+            searchItem.setVisible(false);
             clearBooksItem.setVisible(false);
             deleteBookItem.setVisible(true);
         } else if (currentFragment instanceof BookSearchFragment) {
             deleteBookItem.setVisible(false);
             clearBooksItem.setVisible(!app.booksResults.isEmpty());
+            searchItem.setVisible(true);
+        } else if(currentFragment instanceof WishlistFragment) {
+            searchItem.setVisible(true);
+            clearBooksItem.setVisible(true);
+            deleteBookItem.setVisible(false);
         }
 
         searchView.setMaxWidth(android.R.attr.width);

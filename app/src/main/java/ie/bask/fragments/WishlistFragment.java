@@ -18,7 +18,7 @@ import ie.bask.main.BookopediaApp;
 public class WishlistFragment extends Fragment {
 
     public BookFilter bookFilter;
-    private BookAdapter bookAdapter;
+    public BookAdapter bookAdapter;
     private BookopediaApp app = BookopediaApp.getInstance();
     private RecyclerView rvBooksToRead;
 

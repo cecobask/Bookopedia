@@ -116,10 +116,12 @@ public class BookAdapter extends RecyclerView.Adapter<BookViewHolder> {
                                         actionMode.finish();
 
                                         if (booksArray.isEmpty()){
+                                            BookSearchFragment fragment = BookSearchFragment.newInstance();
                                             ((AppCompatActivity) context).getSupportFragmentManager()
                                                     .beginTransaction()
-                                                    .replace(R.id.flContent, BookSearchFragment.newInstance())
+                                                    .replace(R.id.flContent, fragment)
                                                     .commit();
+                                            MainActivity.getInstance().currentFragment = fragment;
                                         }
                                     }
                                 });
@@ -147,11 +149,17 @@ public class BookAdapter extends RecyclerView.Adapter<BookViewHolder> {
                     selectItem(book, holder.itemView);
                 } else {
                     // Launch the BookInfoFragment passing book as an extra
+                    BookInfoFragment fragment = BookInfoFragment.newInstance(booksArray.get(holder.getAdapterPosition()));
                     ((AppCompatActivity) context).getSupportFragmentManager()
                             .beginTransaction()
-                            .replace(R.id.flContent, BookInfoFragment.newInstance(booksArray.get(holder.getAdapterPosition())))
+                            .replace(R.id.flContent, fragment)
                             .commit();
-                    NavigationView nvDrawer = MainActivity.getInstance().nvDrawer;
+
+                    // Access MainActivity's context for using variables in that activity
+                    MainActivity MainActivityContext = MainActivity.getInstance();
+                    // Set current fragment
+                    MainActivityContext.currentFragment = fragment;
+                    NavigationView nvDrawer = MainActivityContext.nvDrawer;
                     nvDrawer.getMenu().findItem(R.id.nav_wishlist).setChecked(false);
                 }
             }

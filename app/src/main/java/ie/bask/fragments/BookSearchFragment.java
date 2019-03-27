@@ -20,8 +20,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -174,26 +172,30 @@ public class BookSearchFragment extends Fragment {
                     @Override
                     public void onClick(View view) {
                         // Launch the BookInfoFragment passing book as an extra
-                        BookInfoFragment bookInfoFragment;
+                        Book bookExtra = null;
                         FragmentTransaction transaction = getFragmentManager().beginTransaction();
                         String clickedID = getItem(holder.getAdapterPosition()).getBookId();
                         boolean no_match = true;
                         // Loop through books in list
                         for (Book elem : app.booksToRead) {
                             if (elem.getBookId().equals(clickedID)) {
-                                bookInfoFragment = BookInfoFragment.newInstance(elem);
-                                transaction.replace(R.id.flContent, bookInfoFragment);
+                                bookExtra = elem;
                                 no_match = false;
                                 break;
                             }
                         }
                         // Mean book is not in the list
                         if (no_match) {
-                            bookInfoFragment = BookInfoFragment.newInstance(getItem(holder.getAdapterPosition()));
-                            transaction.replace(R.id.flContent, bookInfoFragment);
+                            bookExtra = getItem(holder.getAdapterPosition());
                         }
-                        transaction.commit();
-                        NavigationView nvDrawer = ((MainActivity)getActivity()).nvDrawer;
+                        BookInfoFragment fragment = BookInfoFragment.newInstance(bookExtra);
+                        transaction.replace(R.id.flContent, fragment).commit();
+
+                        // Access MainActivity's context for using variables in that activity
+                        MainActivity MainActivityContext = MainActivity.getInstance();
+                        // Set current fragment
+                        MainActivityContext.currentFragment = fragment;
+                        NavigationView nvDrawer = MainActivityContext.nvDrawer;
                         nvDrawer.getMenu().findItem(R.id.nav_home).setChecked(false);
                     }
                 });
