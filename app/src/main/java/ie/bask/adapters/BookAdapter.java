@@ -2,10 +2,10 @@ package ie.bask.adapters;
 
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.design.widget.NavigationView;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
@@ -20,8 +20,8 @@ import android.view.ViewGroup;
 import java.util.ArrayList;
 
 import ie.bask.R;
-import ie.bask.activities.BookInfoActivity;
-import ie.bask.activities.BookListActivity;
+import ie.bask.activities.MainActivity;
+import ie.bask.fragments.BookInfoFragment;
 import ie.bask.main.BookopediaApp;
 import ie.bask.models.Book;
 
@@ -29,7 +29,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookViewHolder> {
 
     ArrayList<Book> booksArray;
     private LayoutInflater mInflater;
-    private Context context;
+    private final Context context;
     private boolean multiSelect = false;
     private ArrayList<Book> selectedItems = new ArrayList<>();
 
@@ -115,9 +115,8 @@ public class BookAdapter extends RecyclerView.Adapter<BookViewHolder> {
                                         actionMode.finish();
 
                                         if (booksArray.isEmpty()){
-                                            ((AppCompatActivity) context).finish();
-                                            Intent goHome = new Intent(context, BookListActivity.class);
-                                            context.startActivity(goHome);
+                                            MainActivity.getInstance()
+                                                    .selectDrawerItem(MainActivity.nvDrawer.getMenu().findItem(R.id.nav_home));
                                         }
                                     }
                                 });
@@ -144,12 +143,17 @@ public class BookAdapter extends RecyclerView.Adapter<BookViewHolder> {
                 if(multiSelect) {
                     selectItem(book, holder.itemView);
                 } else {
-                    // Launch the BookInfoActivity activity passing book as an extra
-                    Intent intent = new Intent(context, BookInfoActivity.class);
-                    intent.putExtra("book_info_key", booksArray.get(holder.getAdapterPosition()));
-                    intent.putExtra("ToReadContext", "ToReadContext");
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    holder.tvTitle.getContext().startActivity(intent);
+                    // Launch the BookInfoFragment passing book as an extra
+                    BookInfoFragment fragment = BookInfoFragment.newInstance(booksArray.get(holder.getAdapterPosition()));
+                    ((AppCompatActivity) context).getSupportFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.flContent, fragment)
+                            .commit();
+
+                    // Set current fragment
+                    MainActivity.currentFragment = fragment;
+                    NavigationView nvDrawer = MainActivity.nvDrawer;
+                    nvDrawer.getMenu().findItem(R.id.nav_wishlist).setChecked(false);
                 }
             }
         });

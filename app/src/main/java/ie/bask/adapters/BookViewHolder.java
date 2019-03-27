@@ -8,10 +8,10 @@ import android.widget.TextView;
 import ie.bask.R;
 
 public class BookViewHolder extends RecyclerView.ViewHolder {
-    public ImageView ivCover;
-    public TextView tvTitle;
-    public TextView tvAuthor;
-    public TextView tvDateAdded;
+    public final ImageView ivCover;
+    public final TextView tvTitle;
+    public final TextView tvAuthor;
+    public final TextView tvDateAdded;
 
     public BookViewHolder(final View itemView) {
         super(itemView);

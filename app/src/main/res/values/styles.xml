@@ -13,10 +13,11 @@
         <item name="android:textColor">@color/md_black_1000</item>
         <item name="windowActionModeOverlay">true</item>
         <item name="actionModeBackground">@color/colorPrimary</item>
+        <item name="android:windowTranslucentStatus">true</item>
     </style>
 
     <style name="AppTheme.NoActionBar">
-        <item name="windowActionBar">false</item>
+        <item name="windowActionBar">false</item>le>
         <item name="windowNoTitle">true</item>
     </style>
 

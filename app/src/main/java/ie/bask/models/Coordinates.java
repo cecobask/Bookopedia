@@ -1,5 +1,7 @@
 package ie.bask.models;
 
+import android.support.annotation.NonNull;
+
 import java.io.Serializable;
 
 public class Coordinates implements Serializable {
@@ -21,6 +23,7 @@ public class Coordinates implements Serializable {
         return longitude;
     }
 
+    @NonNull
     @Override
     public String toString() {
         return "Coordinates{" +

@@ -9,9 +9,12 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+
 import com.google.zxing.Result;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import me.dm7.barcodescanner.zxing.ZXingScannerView;
 
 public class BookScannerActivity extends AppCompatActivity implements ZXingScannerView.ResultHandler {
@@ -35,7 +38,7 @@ public class BookScannerActivity extends AppCompatActivity implements ZXingScann
 
     private void requestPermissions(List<String> access) {
         // Convert List to Array for use in requesting permissions
-        String[] stringArray = access.toArray(new String[access.size()]);
+        String[] stringArray = access.toArray(new String[0]);
         ActivityCompat.requestPermissions(this, stringArray, 1001);
     }
 
