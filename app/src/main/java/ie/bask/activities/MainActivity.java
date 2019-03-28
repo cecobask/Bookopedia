@@ -20,10 +20,14 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.squareup.picasso.Picasso;
 
+import de.hdodenhof.circleimageview.CircleImageView;
 import ie.bask.R;
 import ie.bask.fragments.BookInfoFragment;
 import ie.bask.fragments.BookSearchFragment;
@@ -101,6 +105,17 @@ public class MainActivity extends AppCompatActivity {
                 .commit();
 
         mInstance = this;
+
+        // Setup nav drawer's header
+        View headerLayout = nvDrawer.getHeaderView(0);
+        CircleImageView ivUserPhoto = headerLayout.findViewById(R.id.userPhoto);
+        TextView tvUserEmail = headerLayout.findViewById(R.id.userEmail);
+        tvUserEmail.setText(user.getEmail());
+        if(user.getPhotoUrl()!= null) {
+            Picasso.with(mInstance).load(user.getPhotoUrl()).into(ivUserPhoto);
+        } else {
+            Picasso.with(mInstance).load(R.drawable.ic_default_photo).into(ivUserPhoto);
+        }
     }
 
     private ActionBarDrawerToggle setupDrawerToggle() {
