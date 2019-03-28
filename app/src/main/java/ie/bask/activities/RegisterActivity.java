@@ -13,8 +13,8 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -39,7 +39,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     private Button buttonRegister;
     private ProgressBar progressBar;
     private BookopediaApp app;
-    private RelativeLayout mLayout;
+    private LinearLayout contentLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,7 +60,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         autoCompleteCounty = findViewById(R.id.autoCompleteCounty);
         buttonRegister = findViewById(R.id.buttonRegister);
         progressBar = findViewById(R.id.pbSearch);
-        mLayout = findViewById(R.id.relLayRoot2);
+        contentLayout = findViewById(R.id.contentLayout);
 
         // Load string-array from resources to give suggestions
         // to the user when they start typing
@@ -124,7 +124,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
             // If the email and password are not empty
             // display a ProgressBar
-            mLayout.setAlpha(0.5f);
+            contentLayout.setAlpha(0.3f);
             progressBar.setVisibility(View.VISIBLE);
 
             // Creating a new user
@@ -151,7 +151,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                             } else {
                                 Snackbar.make(buttonRegister, task.getException().getMessage(), Snackbar.LENGTH_SHORT).show();
                             }
-                            mLayout.setAlpha(1f);
+                            contentLayout.setAlpha(1f);
                             progressBar.setVisibility(View.GONE);
                         }
                     });

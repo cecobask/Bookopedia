@@ -1,5 +1,7 @@
 package ie.bask.activities;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -8,10 +10,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -41,7 +44,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private EditText editTextPassword;
     private ProgressBar progressBar;
     private BookopediaApp app;
-    private RelativeLayout mLayout;
+    private LinearLayout contentLayout;
+
+    public static void hideKeyboard(Context context, View view) {
+        InputMethodManager imm = (InputMethodManager) context.getSystemService(Activity.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,7 +64,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         buttonRegister = findViewById(R.id.buttonRegister);
         Button buttonGoogle = findViewById(R.id.buttonGoogleLogin);
         progressBar = findViewById(R.id.pbSearch);
-        mLayout = findViewById(R.id.relLayRoot);
+        contentLayout = findViewById(R.id.contentLayout);
 
         // Configure sign-in to request the user's ID, email address, and basic
         // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
@@ -83,50 +91,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         buttonLogin.setOnClickListener(this);
         buttonRegister.setOnClickListener(this);
         buttonGoogle.setOnClickListener(this);
-    }
-
-
-    private void firebaseLogin() {
-
-        // Get values from widgets
-        String email = editTextEmail.getText().toString().trim();
-        String password = editTextPassword.getText().toString().trim();
-
-
-        // Checking if email and passwords are empty
-        if (TextUtils.isEmpty(email)) {
-            editTextEmail.setError("Email is required!");
-            editTextEmail.requestFocus();
-            return;
-        }
-
-        if (TextUtils.isEmpty(password)) {
-            editTextPassword.setError("Password is required!");
-            editTextPassword.requestFocus();
-            return;
-        }
-
-        // If the email and password are not empty
-        // displaying a ProgressBar
-        mLayout.setAlpha(0.5f);
-        progressBar.setVisibility(View.VISIBLE);
-
-        // Logging in the user
-        app.firebaseAuth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        mLayout.setAlpha(1f);
-                        progressBar.setVisibility(View.GONE);
-                        if (task.isSuccessful()) {
-                            loadBooks(task.getResult().getUser().getUid());
-                            finish();
-                            startActivity(new Intent(getApplicationContext(), MainActivity.class));
-                        } else {
-                            Snackbar.make(buttonLogin, task.getException().getMessage(), Snackbar.LENGTH_SHORT).show();
-                        }
-                    }
-                });
     }
 
     /**
@@ -191,12 +155,56 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
     }
 
+    private void firebaseLogin() {
+
+        // Get values from widgets
+        String email = editTextEmail.getText().toString().trim();
+        String password = editTextPassword.getText().toString().trim();
+
+
+        // Checking if email and passwords are empty
+        if (TextUtils.isEmpty(email)) {
+            editTextEmail.setError("Email is required!");
+            editTextEmail.requestFocus();
+            return;
+        }
+
+        if (TextUtils.isEmpty(password)) {
+            editTextPassword.setError("Password is required!");
+            editTextPassword.requestFocus();
+            return;
+        }
+
+        // If the email and password are not empty
+        // displaying a ProgressBar
+        progressBar.setVisibility(View.VISIBLE);
+        contentLayout.setAlpha(0.3f);
+        hideKeyboard(LoginActivity.this, editTextEmail);
+
+        // Logging in the user
+        app.firebaseAuth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        progressBar.setVisibility(View.GONE);
+                        contentLayout.setAlpha(1f);
+                        if (task.isSuccessful()) {
+                            loadBooks(task.getResult().getUser().getUid());
+                            finish();
+                            startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                        } else {
+                            Snackbar.make(buttonLogin, task.getException().getMessage(), Snackbar.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+    }
+
     private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
         Log.v("Bookopedia", "firebaseAuthWithGoogle:" + acct.getId());
 
         // Display progress bar
-        mLayout.setAlpha(0.5f);
         progressBar.setVisibility(View.VISIBLE);
+        contentLayout.setAlpha(0.3f);
 
         AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
         app.firebaseAuth.signInWithCredential(credential)
@@ -208,8 +216,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                             Log.v("Bookopedia", "signInWithCredential:success");
                             FirebaseUser user = app.firebaseAuth.getCurrentUser();
                             loadBooks(user.getUid());
-                            mLayout.setAlpha(1f);
                             progressBar.setVisibility(View.GONE);
+                            contentLayout.setAlpha(1f);
                             finish();
                             startActivity(new Intent(LoginActivity.this, MainActivity.class));
                         } else {
