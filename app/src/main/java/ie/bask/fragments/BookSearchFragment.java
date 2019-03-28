@@ -218,7 +218,7 @@ public class BookSearchFragment extends Fragment {
     public void getBooks(String query) {
         // Show progress bar if search query is not empty
         if (query.length() > 0) {
-            mLayout.setAlpha(0.5f);
+            mLayout.setAlpha(0.3f);
             pbSearch.setVisibility(View.VISIBLE);
         }
 
