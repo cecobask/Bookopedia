@@ -5,7 +5,6 @@
     <color name="colorPrimaryDark">#512DA8</color>
     <color name="colorAccent">#FF4081</color>
     <color name="design_snackbar_background_color" tools:override="true">@color/md_red_50</color>
-    <color name="md_red_50">#FFEBEE</color>
     <color name="md_deep_purple_A700">#6200EA</color>
     <color name="md_blue_200">#90CAF9</color>
     <color name="md_teal_A100">#A7FFEB</color>

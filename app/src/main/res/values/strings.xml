@@ -18,8 +18,8 @@
     <string name="user_login">User Login</string>
     <string name="email_hint">Enter e-mail</string>
     <string name="password_hint">Choose a password</string>
-    <string name="login_button">Login</string>
-    <string name="register_button">Sign me up!</string>
+    <string name="login_button"><b>Login</b></string>
+    <string name="register_button"><b>Sign me up!</b></string>
     <string name="user_registration">User Registration</string>
     <string name="username_hint">Create a username</string>
     <string name="county_hint">Enter county</string>
@@ -28,7 +28,6 @@
     <string name="book_added">Added to list</string>
     <string name="welcome_message">Welcome to Bookopedia!\n\nMake a book query by using\nthe search icon above :)\n\n\nTRY THE BARCODE SCANNER!</string>
     <string name="no_results">No results found.\nSorry for the inconvenience.</string>
-    <string name="google_sign_in">Google Sign-in</string>
     <string name="google_maps_key">AIzaSyAlBLpqbGKcEEsCH8rU_xhq-hze7vzGcFg</string>
     <string name="drawer_open">Open navigation drawer</string>
     <string name="drawer_close">Close navigation drawer</string>

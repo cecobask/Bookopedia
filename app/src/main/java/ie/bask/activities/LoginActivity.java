@@ -19,6 +19,7 @@ import android.widget.ProgressBar;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -63,7 +64,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         editTextPassword = findViewById(R.id.editTextPassword);
         buttonLogin = findViewById(R.id.buttonLogin);
         buttonRegister = findViewById(R.id.buttonRegister);
-        Button buttonGoogle = findViewById(R.id.buttonGoogleLogin);
+        SignInButton buttonGoogle = findViewById(R.id.sign_in_button);
         progressBar = findViewById(R.id.pbSearch);
         contentLayout = findViewById(R.id.contentLayout);
 
@@ -87,6 +88,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             finish();
             startActivity(new Intent(LoginActivity.this, MainActivity.class));
         }
+
+        buttonGoogle.setColorScheme(SignInButton.COLOR_DARK);
+        buttonGoogle.setSize(SignInButton.SIZE_WIDE);
 
         // Set onClick listeners to buttons
         buttonLogin.setOnClickListener(this);
