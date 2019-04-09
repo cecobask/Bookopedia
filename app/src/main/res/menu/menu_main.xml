@@ -12,7 +12,7 @@
 
     <item
         android:id="@+id/action_clear"
-        android:icon="@drawable/ic_clear"
+        android:icon="@drawable/ic_delete"
         android:title="@string/clear_books"
         app:showAsAction="ifRoom" />
 
