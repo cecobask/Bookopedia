@@ -4,12 +4,14 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -32,6 +34,8 @@ public class BookAdapter extends RecyclerView.Adapter<BookViewHolder> {
     private final Context context;
     private boolean multiSelect = false;
     private ArrayList<Book> selectedItems = new ArrayList<>();
+    private Handler handler = new Handler();
+    private Runnable runnable;
 
     // data is passed into the constructor
     public BookAdapter(Context context, ArrayList<Book> booksArray) {
@@ -108,10 +112,18 @@ public class BookAdapter extends RecyclerView.Adapter<BookViewHolder> {
                                             // Delete selected books
                                             booksArray.remove(book);
                                             BookopediaApp.getInstance().booksToReadDb.child(book.getBookId()).removeValue();
-                                            holder.itemView.findViewById(R.id.rel_layout).setBackgroundColor(Color.TRANSPARENT);
                                             multiSelect = false;
+                                            // Delay the notifyDataSetChanged command. This gives
+                                            // the RecyclerView enough time to respond to changes.
+                                            handler.removeCallbacks(runnable);
+                                            runnable = new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    notifyDataSetChanged();
+                                                }
+                                            };
+                                            handler.postDelayed(runnable, 500);
                                         }
-                                        notifyDataSetChanged();
                                         actionMode.finish();
 
                                         if (booksArray.isEmpty()){
@@ -127,8 +139,10 @@ public class BookAdapter extends RecyclerView.Adapter<BookViewHolder> {
                     @Override
                     public void onDestroyActionMode(ActionMode actionMode) {
                         multiSelect = false;
-                        notifyDataSetChanged();
                         selectedItems.clear();
+                        holder.itemView.findViewById(R.id.rel_layout).setBackgroundColor(Color.TRANSPARENT);
+                        notifyDataSetChanged();
+                        Log.v("Bookopedia", "booksArray: "+booksArray.size());
                     }
                 });
                 selectItem(book, holder.itemView);
