@@ -35,7 +35,7 @@ public class WishlistFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.activity_to_read_books, container, false);
+        View view = inflater.inflate(R.layout.wishlist, container, false);
         rvBooksToRead = view.findViewById(R.id.rvBooksToRead);
 
         return view;

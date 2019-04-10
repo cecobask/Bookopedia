@@ -80,7 +80,7 @@ public class BookSearchFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.activity_book_list, container, false);
+        View view = inflater.inflate(R.layout.book_search, container, false);
         pbSearch = view.findViewById(R.id.pbSearch);
         slogan = view.findViewById(R.id.slogan);
         fab = view.findViewById(R.id.fab_scan);

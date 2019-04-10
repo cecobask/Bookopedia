@@ -2,6 +2,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <color name="colorPrimary">#673AB7</color>
+    <color name="selected_item">#DCCCFF</color>
     <color name="colorPrimaryDark">#512DA8</color>
     <color name="colorAccent">#FF4081</color>
     <color name="design_snackbar_background_color" tools:override="true">@color/md_red_50</color>

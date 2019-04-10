@@ -85,7 +85,7 @@ public class BookInfoFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.activity_book_info, container, false);
+        View view = inflater.inflate(R.layout.book_info, container, false);
         ivBookCover = view.findViewById(R.id.ivBookCover);
         tvTitle = view.findViewById(R.id.tvTitle);
         tvAuthor = view.findViewById(R.id.tvAuthor);

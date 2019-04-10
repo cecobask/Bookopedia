@@ -68,7 +68,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookViewHolder> {
 
         // Deselect selection when Action bar closes
         if(!multiSelect){
-            holder.itemView.setBackgroundColor(Color.TRANSPARENT);
+            holder.itemView.findViewById(R.id.rel_layout).setBackgroundColor(Color.TRANSPARENT);
         }
 
         // Long click listener for starting ActionMode
@@ -108,7 +108,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookViewHolder> {
                                             // Delete selected books
                                             booksArray.remove(book);
                                             BookopediaApp.getInstance().booksToReadDb.child(book.getBookId()).removeValue();
-                                            holder.itemView.setBackgroundColor(Color.TRANSPARENT);
+                                            holder.itemView.findViewById(R.id.rel_layout).setBackgroundColor(Color.TRANSPARENT);
                                             multiSelect = false;
                                         }
                                         notifyDataSetChanged();
@@ -168,10 +168,10 @@ public class BookAdapter extends RecyclerView.Adapter<BookViewHolder> {
         if (multiSelect) {
             if (selectedItems.contains(book)) {
                 selectedItems.remove(book);
-                itemView.setBackgroundColor(Color.TRANSPARENT);
+                itemView.findViewById(R.id.rel_layout).setBackgroundColor(Color.TRANSPARENT);
             } else {
                 selectedItems.add(book);
-                itemView.setBackgroundColor(context.getColor(R.color.md_blue_200));
+                itemView.findViewById(R.id.rel_layout).setBackgroundColor(context.getColor(R.color.selected_item));
             }
         }
     }
