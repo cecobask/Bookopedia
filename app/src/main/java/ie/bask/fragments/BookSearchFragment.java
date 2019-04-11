@@ -255,6 +255,7 @@ public class BookSearchFragment extends Fragment {
                         app.bookResultsDb.removeValue();
                         tvNoResults.setVisibility(View.VISIBLE);
                         tvNoResults.setText(getString(R.string.no_results));
+                        fab.show();
                         slogan.setVisibility(View.GONE);
                     }
                 } catch (JSONException e) {

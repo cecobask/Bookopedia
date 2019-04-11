@@ -27,7 +27,7 @@
     <string name="login_pass_hint">Enter password</string>
     <string name="book_added">Added to list</string>
     <string name="welcome_message">Welcome to Bookopedia!\n\nMake a book query by using\nthe search icon above :)\n\n\nTRY THE BARCODE SCANNER!</string>
-    <string name="no_results">No results found.\nSorry for the inconvenience.</string>
+    <string name="no_results">No results found.\nSorry for the inconvenience.\n\n\n\n\n\n\n\n\nTRY THE BARCODE SCANNER!</string>
     <string name="google_maps_key">AIzaSyAlBLpqbGKcEEsCH8rU_xhq-hze7vzGcFg</string>
     <string name="drawer_open">Open navigation drawer</string>
     <string name="drawer_close">Close navigation drawer</string>

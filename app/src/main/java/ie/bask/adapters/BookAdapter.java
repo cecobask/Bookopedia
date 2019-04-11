@@ -215,7 +215,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookViewHolder> {
     private void showUndoSnackbar() {
         View view = ((AppCompatActivity)context).findViewById(R.id.drawer_layout);
         Snackbar snackbar = Snackbar.make(view, "Book deleted.", 3000);
-        snackbar.setAction("Undo deletion?", new View.OnClickListener() {
+        snackbar.setAction("Undo deletion", new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 undoDelete();

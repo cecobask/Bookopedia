@@ -42,7 +42,7 @@ public class SwipeToDeleteCallback extends ItemTouchHelper.SimpleCallback {
     @Override
     public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
         super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
-        View itemView = viewHolder.itemView.findViewById(R.id.rel_layout);
+        View itemView = viewHolder.itemView;
         int backgroundCornerOffset = 20;
         int iconMargin = (itemView.getHeight() - icon.getIntrinsicHeight()) / 2;
         int iconTop = itemView.getTop() + (itemView.getHeight() - icon.getIntrinsicHeight()) / 2;
