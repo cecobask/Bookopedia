@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +15,7 @@ import android.view.ViewGroup;
 import ie.bask.R;
 import ie.bask.adapters.BookAdapter;
 import ie.bask.adapters.BookFilter;
+import ie.bask.adapters.SwipeToDeleteCallback;
 import ie.bask.main.BookopediaApp;
 
 public class WishlistFragment extends Fragment {
@@ -44,11 +46,14 @@ public class WishlistFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         // Display books in a RecyclerView
-
         bookAdapter = new BookAdapter(getContext(), app.booksToRead);
         bookFilter = new BookFilter(app.booksToRead, bookAdapter);
         rvBooksToRead.setAdapter(bookAdapter);
         rvBooksToRead.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        // Custom implementation of ItemTouchHelper
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new SwipeToDeleteCallback(bookAdapter));
+        itemTouchHelper.attachToRecyclerView(rvBooksToRead);
     }
 
     @Override

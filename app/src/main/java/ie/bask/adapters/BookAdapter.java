@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
@@ -36,6 +37,10 @@ public class BookAdapter extends RecyclerView.Adapter<BookViewHolder> {
     private ArrayList<Book> selectedItems = new ArrayList<>();
     private Handler handler = new Handler();
     private Runnable runnable;
+    private Book mRecentlyDeletedItem;
+    private int mRecentlyDeletedItemPosition;
+    private MainActivity mainActivity = MainActivity.getInstance();
+    private BookopediaApp app = BookopediaApp.getInstance();
 
     // data is passed into the constructor
     public BookAdapter(Context context, ArrayList<Book> booksArray) {
@@ -111,7 +116,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookViewHolder> {
                                         for (Book book : selectedItems) {
                                             // Delete selected books
                                             booksArray.remove(book);
-                                            BookopediaApp.getInstance().booksToReadDb.child(book.getBookId()).removeValue();
+                                            app.booksToReadDb.child(book.getBookId()).removeValue();
                                             multiSelect = false;
                                             // Delay the notifyDataSetChanged command. This gives
                                             // the RecyclerView enough time to respond to changes.
@@ -119,7 +124,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookViewHolder> {
                                             runnable = new Runnable() {
                                                 @Override
                                                 public void run() {
-                                                    notifyDataSetChanged();
+                                                    notifyItemRemoved(holder.getAdapterPosition());
                                                 }
                                             };
                                             handler.postDelayed(runnable, 500);
@@ -127,8 +132,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookViewHolder> {
                                         actionMode.finish();
 
                                         if (booksArray.isEmpty()){
-                                            MainActivity.getInstance()
-                                                    .selectDrawerItem(MainActivity.nvDrawer.getMenu().findItem(R.id.nav_home));
+                                            mainActivity.selectDrawerItem(MainActivity.nvDrawer.getMenu().findItem(R.id.nav_home));
                                         }
                                     }
                                 });
@@ -188,6 +192,42 @@ public class BookAdapter extends RecyclerView.Adapter<BookViewHolder> {
                 itemView.findViewById(R.id.rel_layout).setBackgroundColor(context.getColor(R.color.selected_item));
             }
         }
+    }
+
+    void deleteItem(int position) {
+        mRecentlyDeletedItem = booksArray.get(position);
+        mRecentlyDeletedItemPosition = position;
+        app.booksToReadDb.child(mRecentlyDeletedItem.getBookId()).removeValue();
+        booksArray.remove(position);
+        notifyItemRemoved(position);
+
+        if (booksArray.isEmpty()){
+            mainActivity.selectDrawerItem(MainActivity.nvDrawer.getMenu().findItem(R.id.nav_home));
+        } else {
+            showUndoSnackbar();
+        }
+    }
+
+    public Context getContext() {
+        return context;
+    }
+
+    private void showUndoSnackbar() {
+        View view = ((AppCompatActivity)context).findViewById(R.id.drawer_layout);
+        Snackbar snackbar = Snackbar.make(view, "Book deleted.", 3000);
+        snackbar.setAction("Undo deletion?", new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                undoDelete();
+            }
+        });
+        snackbar.show();
+    }
+
+    private void undoDelete() {
+        booksArray.add(mRecentlyDeletedItemPosition, mRecentlyDeletedItem);
+        app.booksToReadDb.child(mRecentlyDeletedItem.getBookId()).setValue(mRecentlyDeletedItem);
+        notifyItemInserted(mRecentlyDeletedItemPosition);
     }
 
 }
