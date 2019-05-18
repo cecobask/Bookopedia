@@ -204,49 +204,6 @@ public class BookInfoFragment extends Fragment {
         }
     }
 
-//    @Override
-//    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-//        inflater.inflate(R.menu.menu_main, menu);
-//        final MenuItem searchItem = menu.findItem(R.id.action_search);
-//        final MenuItem clearBooksItem = menu.findItem(R.id.action_clear);
-//        final MenuItem deleteBookItem = menu.findItem(R.id.action_delete);
-//
-//        // Hide menu items
-//        if (book.toReadStatus()){
-//            deleteBookItem.setVisible(true);
-//        } else {
-//            deleteBookItem.setVisible(false);
-//        }
-//        searchItem.setVisible(false);
-//        clearBooksItem.setVisible(false);
-//        super.onCreateOptionsMenu(menu, inflater);
-//    }
-
-//
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        int id = item.getItemId();
-//
-//        switch (id) {
-//            case (R.id.action_home):
-//                Intent goHome = new Intent(getApplicationContext(), BookSearchFragment.class);
-//                startActivity(goHome);
-//                break;
-//            case (R.id.action_to_read):
-//                Intent toReadIntent = new Intent(getApplicationContext(), WishlistFragment.class);
-//                startActivity(toReadIntent);
-//                break;
-//            case (R.id.action_delete):
-//                showDialog(BookInfoFragment.this, "Delete book?", "deleteBook");
-//                break;
-//            case (R.id.action_logout):
-//                showDialog(BookInfoFragment.this, "You are about to log out. Proceed?", "signOut");
-//                break;
-//        }
-//
-//        return super.onOptionsItemSelected(item);
-//    }
-
     private void setButtonListeners(final Book book) {
         btnToRead.setOnClickListener(new View.OnClickListener() {
             @Override
