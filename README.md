@@ -11,7 +11,7 @@ When a book is added to the Wish list, the user's is captured, stored and displa
 3. Deleting a book from the wish list by swiping
 4. Previewing a book
 
-![Android Demo](https://media.giphy.com/media/dBCjXs3bmnHrMJp3kz/giphy.gif)
+![Android Demo](https://media.giphy.com/media/Wn5ZJDxjmJNOZUNEaC/giphy.gif)
 
 ## Getting Started
 
